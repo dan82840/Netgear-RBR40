@@ -397,6 +397,14 @@ int main(int argc, char *argv[])
 						sendACK(&packet, client_ip_align);
 				}
 			}
+
+			if(lease && lease->hostname) {
+				printf("#####hostname = %s\n", lease->hostname);
+				if (strncmp(lease->hostname, "RBS50" , 5) == 0 || strncmp(lease->hostname, "RBS40" , 5) == 0 || strncmp(lease->hostname, "RBW30" , 5) == 0){
+					printf("#####Assign the ip to RBS50\n");
+					system("sleep 20 && /bin/config set soap_setting=AllConfig && killall -SIGUSR1 soap_agent &");
+				}
+			}
 			break;
 		case DHCPDECLINE:
 			DEBUG(LOG_INFO,"received DECLINE");
