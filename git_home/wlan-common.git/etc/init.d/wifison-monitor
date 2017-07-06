@@ -1,0 +1,16 @@
+#!/bin/sh /etc/rc.common
+START=99
+
+start()
+{
+	echo "Init wifison monitor script"
+	/sbin/wifison-monitor.sh &
+}
+
+
+stop()
+{
+	echo "Stop wifison monitor"
+	killall wifison-monitor.sh
+
+}

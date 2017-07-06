@@ -1,0 +1,126 @@
+#!/bin/sh
+
+CONFIG=/bin/config
+if [ "$($CONFIG get wl_conf_mode)" != "2" ]; then
+        [ $(config get endis_wl_radio) -eq 0 ] && ifconfig ath0 up   # fixed the bug when athx is down, will could not scan ssid
+        [ $(config get endis_wla_radio) -eq 0 ] && ifconfig ath1 up
+        sleep 2
+        iwpriv ath0 pause_scan 0
+        iwpriv ath1 pause_scan 0
+        echo "begin scanning apmode 2.4G...."
+        iwlist ath0 scan > /dev/null
+        cp /proc/sys/net/ath0/scan_result /tmp/scan_result_tmp
+        /sbin/scan_result_process
+        cp /tmp/scan_result /tmp/scan_result_2.4G
+
+        echo "scanning 5G...."
+        iwlist ath1 scan timeout 20 > /dev/null
+        cp /proc/sys/net/ath1/scan_result /tmp/scan_result_tmp
+        /sbin/scan_result_process
+        cp /tmp/scan_result /tmp/scan_result_5G
+
+        [ $(config get endis_wl_radio) -eq 0 ] && ifconfig ath0 down
+        [ $(config get endis_wla_radio) -eq 0 ] && ifconfig ath1 down
+
+elif [ "$($CONFIG get fastlane_surfing_type)" != "1" ]; then
+        iwpriv ath0 pause_scan 0
+        iwpriv ath01 pause_scan 0
+        iwpriv ath1 pause_scan 0
+        iwpriv ath11 pause_scan 0
+        if [ "x`/bin/cat /tmp/link_status`" = "x0" -o "x`/bin/cat /tmp/link_status_5g`" = "x0" ]; then
+            killall -SIGSTOP wpa_supplicant > /dev/null
+        fi
+        echo "begin scanning repeater 2.4G...."
+        iwlist ath01 scan timeout 25 > /dev/null
+        cp /proc/sys/net/ath0/scan_result /tmp/scan_result_tmp
+        /sbin/scan_result_process
+        cp /tmp/scan_result /tmp/scan_result_2.4G
+
+        echo "scanning 5G...."
+        iwlist ath11 scan timeout 25 > /dev/null
+        cp /proc/sys/net/ath1/scan_result /tmp/scan_result_tmp
+        /sbin/scan_result_process
+        cp /tmp/scan_result /tmp/scan_result_5G
+
+        if [ "x`/bin/cat /tmp/link_status`" = "x0" ]; then
+                iwpriv ath0 pause_scan 1
+            iwpriv ath01 pause_scan 1
+            killall -SIGCONT wpa_supplicant > /dev/null
+            if [ "$($CONFIG get ca_end)" = "1" -o "$($CONFIG get sta_wl_ssid)" != "12345678NETGEAR" ]; then
+                killall -SIGINT led-extender
+            fi
+        fi
+        if [ "x`/bin/cat /tmp/link_status_5g`" = "x0" ]; then
+            iwpriv ath1 pause_scan 1
+            iwpriv ath11 pause_scan 1
+            killall -SIGCONT wpa_supplicant > /dev/null
+            if [ "$($CONFIG get ca_end)" = "1" -o "$($CONFIG get sta_wla_ssid)" != "12345678NETGEAR-5G" ]; then
+                killlall -SIGINT led-extender-5G
+            fi
+        fi
+elif [ "$($CONFIG get furfing_mode_type)" = "2.4G" ]; then
+        if [ $(config get endis_wla_radio) -eq 0  ];then
+            ifconfig ath1 up   # fixed the bug when athx is down, will could not scan ssid
+            sleep 2
+        fi
+
+        iwpriv ath01 pause_scan 0
+        iwpriv ath1 pause_scan 0
+        if [ "x`/bin/cat /tmp/link_status`" = "x0" ]; then
+            killall -SIGSTOP wpa_supplicant > /dev/null
+        fi
+        echo "begin scanning fastlane 2.4G...."
+        iwlist ath01 scan timeout 40
+        cp /proc/sys/net/ath01/scan_result /tmp/scan_result_tmp
+        /sbin/scan_result_process
+        cp /tmp/scan_result /tmp/scan_result_2.4G
+        echo "scanning 5G...."
+        iwlist ath1 scan > /dev/null
+        cp /proc/sys/net/ath1/scan_result /tmp/scan_result_tmp
+        /sbin/scan_result_process
+        cp /tmp/scan_result /tmp/scan_result_5G
+        if [ "x`/bin/cat /tmp/link_status`" = "x0" ]; then
+            iwpriv ath01 pause_scan 1
+            killall -SIGCONT wpa_supplicant > /dev/null
+            if [ "$($CONFIG get ca_end)" = "1" -o "$($CONFIG get sta_wl_ssid)" != "12345678NETGEAR" ]; then
+                killall -SIGINT led-extender
+            fi
+        fi
+
+        [ $(config get endis_wla_radio) -eq 0 ] && ifconfig ath1 down
+else
+        if [ $(config get endis_wl_radio) -eq 0  ];then
+            ifconfig ath0 up   # fixed the bug when athx is down, will could not scan ssid
+            sleep 2
+        fi
+
+        iwpriv ath11 pause_scan 0
+        iwpriv ath0 pause_scan 0
+        if [ "x`/bin/cat /tmp/link_status_5g`" = "x0" ]; then
+            killall -SIGSTOP wpa_supplicant > /dev/null
+        fi
+        echo "begin scanning fastlane_5g 2.4G...."
+        iwlist ath0 scan > /dev/null
+        cp /proc/sys/net/ath0/scan_result /tmp/scan_result_tmp
+        /sbin/scan_result_process
+        cp /tmp/scan_result /tmp/scan_result_2.4G
+        echo "scanning 5G...."
+        iwlist ath11 scan timeout 40
+        cp /proc/sys/net/ath11/scan_result /tmp/scan_result_tmp
+        /sbin/scan_result_process
+        cp /tmp/scan_result /tmp/scan_result_5G
+        if [ "x`/bin/cat /tmp/link_status_5g`" = "x0" ]; then
+            iwpriv ath11 pause_scan 1
+            killall -SIGCONT wpa_supplicant > /dev/null
+            if [ "$($CONFIG get ca_end)" = "1" -o "$($CONFIG get sta_wla_ssid)" != "12345678NETGEAR-5G" ]; then
+                killlall -SIGINT led-extender-5G
+            fi
+        fi
+
+        [ $(config get endis_wl_radio) -eq 0   ] && ifconfig ath0 down
+fi
+
+
+echo 1 > /tmp/is_scan_setup
+
+echo "wireless scan done!"

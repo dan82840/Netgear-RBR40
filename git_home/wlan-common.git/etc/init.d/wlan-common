@@ -1,0 +1,68 @@
+#!/bin/sh /etc/rc.common
+#START=80
+
+[ -f /etc/ath/wifi.conf ] && . /etc/ath/wifi.conf
+
+# workaround, these status files missing after boot up with radio disabled.
+# Currently uhttpd limit net-cgi running time to 3 secs. 3 secs can't afford 2 "wlan" commands.
+# TODO: "wlan" command eat too much time, really need a fix for net-cgi.
+dni_wlan_status_init()
+{
+	echo "OFF" > /tmp/WLAN_2G_status
+	echo "OFF" > /tmp/WLAN_5G_status
+	echo "OFF" > /tmp/WLAN_status_a2
+}
+
+boot() {
+	dni_wlan_status_init
+       wlan updateconf boot
+       if [ "x$(/bin/config get factory_mode)" = "x1" ]; then
+           model_id=`/sbin/artmtd -r board_model_id | awk -F: '{print $2}'`
+           if [ "x$model_id" = "xRBS50" ]; then
+               uci set wireless.@wifi-iface[3].mode=ap
+               uci commit wireless
+           fi
+           if [ "x$model_id" = "xRBS30" -o "x$model_id" = "xRBS40" ]; then
+               uci set wireless.@wifi-iface[2].mode=ap
+               uci set wireless.@wifi-iface[2].encryption=none
+               uci set wireless.@wifi-iface[2].key=
+               uci set wireless.@wifi-iface[2].backhaul=0
+               uci commit wireless
+           fi
+       fi
+       wlan down
+       wlan up
+       if [ "x$wig_exist" = "xon" ]; then
+           wigig updateconf
+           wigig down
+           wigig up
+       fi
+	# disable wifi interface when boot in factory mode
+	# and set power to amber to tell now the dut boot is finish
+	if [ "x$(/bin/config get factory_mode)" = "x1" ]; then
+		ifconfig ath2 down
+		ifconfig ath01 down
+		ifconfig ath0 down
+		ifconfig ath1 down
+		/sbin/ledcontrol -n power -c amber -s on
+	fi
+}
+
+start()    # don't use this command unless you know what it means
+{
+        wlan updateconf
+        wlan up
+}
+
+stop()    # don't use this command unless you know what it means
+{
+        wlan updateconf
+        wlan down
+}
+
+restart()
+{
+        wlan updateconf
+        wlan down
+        wlan up
+}

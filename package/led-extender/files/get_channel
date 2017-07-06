@@ -1,0 +1,55 @@
+#!/bin/sh
+
+#this is used for get ap interface channel,origin wlan radio 11g --channel 
+#need about 1.5s,will lead to GUI status/wireless page show slowly,so
+#use the new get_channel 11g/11a command to get channel
+
+if [ "$1" = "11a" ]; then
+    ifname="ath1"
+else
+    ifname="ath0"
+fi
+isap=`iwconfig $ifname | grep Master`
+[ -z "$isap" ] && exit
+p_chan=`iwlist $ifname chan | grep Current | awk '{printf "%d\n", substr($5,1,length($5))}'`
+cur_mode=`iwpriv $ifname g_dni_curmode | cut -d: -f2`
+is_20=`echo $cur_mode | grep '20'`
+is_plus=`echo $cur_mode | grep 'PLUS'`
+is_minus=`echo $cur_mode | grep 'MINUS'`
+is_80=`echo $cur_mode | grep '80'`
+if [ -n "$is_20" ]; then
+    chan=$p_chan
+elif [ -n "$is_plus" ]; then
+    s_chan=$(($p_chan + 4));
+    chan="${p_chan}(p) + ${s_chan}(s)"
+elif [ -n "$is_minus" ]; then
+    s_chan=$(($p_chan - 4));
+    chan="${s_chan}(s) + ${p_chan}(p)"
+elif [ -n "$is_80" ]; then
+                        case "${p_chan}" in
+                            36) chan="36(p) + 40 + 44 + 48" ;;
+                            40) chan="36 + 40(p) + 44 + 48" ;;
+                            44) chan="36 + 40 + 44(p) + 48" ;;
+                            48) chan="36 + 40 + 44 + 48(p)" ;;
+                            52) chan="52(p) + 56 + 60 + 64" ;;
+                            56) chan="52 + 56(p) + 60 + 64" ;;
+                            60) chan="52 + 56 + 60(p) + 64" ;;
+                            64) chan="52 + 56 + 60 + 64(p)" ;;
+                            100) chan="100(p) + 104 + 108 + 112" ;;
+                            104) chan="100 + 104(p) + 108 + 112" ;;
+                            108) chan="100 + 104 + 108(p) + 112" ;;
+                            112) chan="100 + 104 + 108 + 112(p)" ;;
+                            116) chan="116(p) + 120 + 124 + 128" ;;
+                            120) chan="116 + 120(p) + 124 + 128" ;;
+                            124) chan="116 + 120 + 124(p) + 128" ;;
+                            128) chan="116 + 120 + 124 + 128(p)" ;;
+                            149) chan="149(p) + 153 + 157 + 161";;
+                            153) chan="149 + 153(p) + 157 + 161";;
+                            157) chan="149 + 153 + 157(p) + 161";;
+                            161) chan="149 + 153 + 157 + 161(p)";;
+                        esac
+else
+    chan=$p_chan
+fi
+echo "$chan"
+

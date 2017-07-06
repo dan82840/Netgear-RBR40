@@ -1,0 +1,55 @@
+#! /bin/sh
+
+wlg_exist="on"
+wla_exist="on"
+
+if [ "$wla_exist" = "on" ]; then
+    country_code_0=710              # Africa
+    country_code_1=764              # Asia Thailand
+    country_code_2=5000             # Australi
+    country_code_3=5001             # Canada
+    country_code_4=276              # Europe Germany
+    country_code_5=376              # Israel
+    country_code_6=392              # Japan
+    country_code_7=412              # Korea
+    country_code_8=484              # Mexica
+    country_code_9=76               # South America Brazil
+    country_code_10=843             # United States
+    country_code_11=156             # China
+    country_code_12=356             # India
+    country_code_13=458             # Malaysia
+    country_code_14=12              # Middle East (Algeria/Syria/Yemen), use Algeria
+    country_code_15=364             # Middle East (Iran/Lebanon/Qatar), use Iran
+    country_code_16=792             # Middle East (Turkey/Egypt/Tunisia/Kuwait), use Turkey
+    country_code_17=682             # Middle East (Saudi Arabia)
+    country_code_18=784             # Middle East (United Arab Emirates)
+    country_code_19=643             # Russia
+    country_code_20=702             # Singapore
+    country_code_21=158             # Taiwan
+else
+    country_code_0=710              # Africa
+    country_code_1=764              # Asia Thailand
+    country_code_2=5000             # Australi
+    country_code_4=276              # Europe Germany
+    country_code_5=376              # Israel
+    country_code_6=392              # Japan
+    country_code_7=412              # Korea
+    country_code_8=484              # Mexica
+    country_code_9=76               # South America Brazil
+    country_code_10=841             # North America
+    country_code_11=376             # Middle East, use Israel instead
+    country_code_12=356             # India
+    country_code_19=643             # Russia
+    country_code_22=376             # Middle East, use Israel instead
+fi
+
+set_region_code()
+{
+	eval country_code=\$country_code_`config get wl_country`
+	iwpriv wifi0 setCountryID $country_code 
+	iwpriv wifi1 setCountryID $country_code
+}
+
+set_region_code
+
+rm -rf /tmp/have_set_txpower

@@ -1,0 +1,18 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org 
+
+START=99
+start() {
+	if [ "x$(/bin/config get factory_mode)" = "x1" ]; then
+		/sbin/ledcontrol -n all -c green -s off > /dev/null 2>&1
+		/bin/rm /sbin/ping-netgear
+		echo "in factory mode"
+	else
+		/sbin/ping-netgear &
+	fi
+	[ -f /etc/sysctl.conf ] && sysctl -p >&-
+	[ -d /etc/sysctl.d ] && \
+		for i in /etc/sysctl.d/*.conf; do
+			sysctl -p $i >&-
+		done
+}

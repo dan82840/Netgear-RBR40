@@ -1,0 +1,37 @@
+diff --git a/sh/jshn.sh b/sh/jshn.sh
+index 5db1667..9212db1 100644
+--- a/sh/jshn.sh
++++ b/sh/jshn.sh
+@@ -55,7 +55,7 @@ _json_add_generic() {
+ 	if [ "${4%%[0-9]*}" = "JSON_ARRAY" ]; then
+ 		_json_inc "SEQ_$4" var
+ 	else
+-		local name="${2//[^a-zA-Z0-9_]/_}"
++		local name=`echo "$2" | sed 's/[^a-zA-Z0-9_]/_/g'`
+ 		[[ "$name" == "$2" ]] || export -- "${JSON_PREFIX}NAME_${4}_${name}=$2"
+ 		var="$name"
+ 	fi
+diff --git a/sh/jshn.sh b/sh/jshn.sh
+index 3897224..690777c 100644
+--- a/sh/jshn.sh
++++ b/sh/jshn.sh
+@@ -186,7 +186,8 @@ json_get_type() {
+ 	local __cur
+ 
+ 	_json_get_var __cur JSON_CUR
+-	local __var="${JSON_PREFIX}TYPE_${__cur}_${2//[^a-zA-Z0-9_]/_}"
++	local __tmp=`echo "$2" | sed 's/[^a-zA-Z0-9_]/_/g'`
++	local __var="${JSON_PREFIX}TYPE_${__cur}_${__tmp}"
+ 	eval "export -- \"$__dest=\${$__var}\"; [ -n \"\${$__var+x}\" ]"
+ }
+ 
+@@ -231,7 +232,8 @@ json_get_var() {
+ 	local __cur
+ 
+ 	_json_get_var __cur JSON_CUR
+-	local __var="${JSON_PREFIX}${__cur}_${2//[^a-zA-Z0-9_]/_}"
++	local __tmp=`echo "$2" | sed 's/[^a-zA-Z0-9_]/_/g'`
++	local __var="${JSON_PREFIX}${__cur}_${__tmp}"
+ 	eval "export -- \"$__dest=\${$__var:-$3}\"; [ -n \"\${$__var+x}\${3+x}\" ]"
+ }
+ 

@@ -1,0 +1,59 @@
+comment "Product's information"
+
+config DGC_MODULE_NAME
+	string "product's module name"
+	default DGC_PRODUCT_NAME
+	help
+	  Specify product's module name, it's same as DGC_PRODUCT_NAME in generally.
+	  in target/linux/*/image/Makefile may use this config to generate image.
+
+config DGC_MODULE_NAME_CC
+	string "product's sub-module name"
+	default DGC_PRODUCT_NAME_CC
+	help
+	  Specify product's sub-module name, it's same as DGC_PRODUCT_NAME_CC in generally, only used for some products such as Orbi-mini.
+	  in target/linux/*/image/Makefile may use this config to generate image.
+
+config DGC_HW_VERSION
+	string "product's hardware version"
+	default DGC_PRODUCT_NAME
+	help
+	  Specify product's hardware name, it's same as DGC_PRODUCT_NAME in generally.
+	  in target/linux/*/image/Makefile may use this config to generate image.
+
+config DGC_HW_ID
+	string "product's hardware id"
+	default ""
+	help
+	  specify product's hardware id, the value should be provided by hardware designed RD.
+	  HW_ID will be used in u-boot and firmware to check image.
+
+comment "Firmware's information"
+
+config DGC_FW_VERSION
+	string "Firmware version"
+	default ""
+	help
+	  Specify firmware version string.
+	  e.g. "V1.0.1.20".
+
+config DGC_LG_VERSION
+	string "Language version"
+	default ""
+	help
+	  Specify language version string.
+	  e.g. "V1.0.0.244".
+
+config DGC_FW_REGION
+	string "Firmware region"
+	default ""
+	help
+	  Specify firmware region string.
+	  e.g. "WW", "NA" etc.
+
+config DGC_CLOUD_VERSION
+	string "ReadyGenieCloud binary version"
+	default ""
+	help
+	  Specify ReadyGenieCloud binary version.
+

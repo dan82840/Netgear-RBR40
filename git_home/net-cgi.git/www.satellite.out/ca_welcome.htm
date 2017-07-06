@@ -1,0 +1,37 @@
+<% http_head("EXT_STR0250","js/setup.js") %>
+<body class="home setup" onload="loadvalue();">
+<% top_bar() %>
+<% save_timestamp("select_language","change_language") %>
+<script>
+var satellite_status="<% cat_file("/tmp/link_status") %>";
+var satellite_status_5g="<% cat_file("/tmp/link_status_5g") %>";
+
+function loadvalue()
+{
+	if(satellite_status == "1" || satellite_status_5g == "1")
+		location.href="status.htm";
+	else
+		document.getElementById("content").style.display="";
+}
+</script>
+
+<div id="content" style="display:none">
+	<div class="container">
+		<div class="main simpleChoiceWrapper">
+			<h1 class="margin_bottom_50">Your Satellite is not connecting to the Orbi network</h1>
+			<p>This is most likely due to one of the following reasons.</p>
+			<p><b>1. It might be too far away from Orbi Network</b></p>
+			<p>Please turn the Satellite off, move it closer, and back on. Wait 2 minutes for Satellite to complete start up.</p>
+			<p><b>2. Your Satellite might not setup successfully</b></p>
+			<p>Make sure both your Base and Satellites are turned on, press WPS button on both devices. Wait for 2 minutes to complete setup.</p>
+			<h1>&nbsp;</h1>
+			<div class="simpleChoice singleBtn">
+				<a class="btn wide primary" href="status.htm" id="extenderBt">$ok_mark</a>
+			</div>
+
+		</div> <!-- end main -->
+	</div> <!-- end container -->
+</div>
+
+</body>
+</html>

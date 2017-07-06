@@ -1,0 +1,30 @@
+===============================
+ Orbi Build Instructions
+===============================
+
+Note:
+	* This package has been built successfully on Ubuntu 10.04.3 (Server) with gcc.
+	* Compiling this package on platforms other than Ubuntu 10.04.3 may have unexpected results.
+
+
+============
+ Build code
+============
+
+1. uncompress source code file _gpl_src.zip.
+
+	unzip Orbi-mini-V1.4.0.24_gpl_src.tar.bz2.zip
+	tar -jxvf Orbi-mini-V1.4.0.24_gpl_src.tar.bz2
+
+	tar -jxvf toolchain.tar.bz2
+	cp toolchain/* Orbi-mini-V1.4.0.24_gpl_src/
+
+2. run following commands to build.
+
+	cd Orbi-mini-V1.4.0.24_gpl_src
+	cp configs/defconfig-orbi-mini .config
+	make V=99
+
+3. the final image is "bin/ipq806x/RBR40-V1.4.0.24.img and RBS40-V1.4.0.24.img".
+
+User may upgrade to this image using the Orbi GUI "Router Upgrade" page.

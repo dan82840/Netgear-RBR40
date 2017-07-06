@@ -1,0 +1,244 @@
+<% http_header("style/form2.css","css/localstyle.css", "/funcs_min.js", "/orbi_upgrade.js") %>
+<body onLoad="loadvalue(); please_wait(false);">
+<% form_submit("apply", "UPG_upgrade.htm", "manual_upgrade")  %>
+<div id="online" class="label_unclick" onclick="click_online()">
+	<div class="label_left"></div>
+	<div class="label_middle"><b><span>$ORT_010</span></b></div>
+	<div class="label_right"></div>
+</div>
+<div id="manual" class="label_unclick" onclick="click_manual()">
+	<div class="label_left"></div>
+	<div class="label_middle"><b><span>$ORT_011</span></b></div>
+	<div class="label_right"></div>
+</div>
+</form>
+<div id="main" class="main" style="top:60px;">
+<% form_submit("apply", "UPG_upgrade.htm", "upgrade_orbi_image")  %>
+<style>
+.type-file-file{position:absolute; left:-150px; opacity:0; filter:alpha(opacity=0); z-index: 2; font-size:100px; width:450px; height:20px; padding-top:4px}
+#fw_check_table table{width:80%;}
+#fw_check_table table tr {text-align:center;}
+
+</style>
+<script>
+<% refresh_timestamp("upgrade_orbi_image", "upgrade_base_image", "manual_upgrade", "download_orbi_confile", "upgrade_satellite_image", "orbi_auto_upgrade") %>
+
+if(top.location.href.indexOf("adv_index") != -1)
+{
+	if(top.document.getElementById('admin_sub').style.display == "none")
+		top.open_or_close_sub('admin');
+	top.menu_color_change('upgrade');
+}
+<% wait_satellite_dev_info() %>
+<% cfg_set("set_auto_agreement", "0") %>
+var device_names = <% get_device_name() %>;
+var base_dev_info = <% get_base_dev_info() %>;
+var ext_dev_info = <% get_satellite_dev_info() %>;
+var wan_status=<% detwan_valid() %>;
+var ts="<% cfg_get("upgrade_orbi_image") %>"
+var orbi_auto_upg = "<% cfg_get("orbi_auto_upg") %>"
+var url="UPG_upgrade.htm";
+var no_new_version = "$no_new_version";
+var plz_wait_moment = "$wait_serv";
+var ORT_005="$ORT_005"
+var ORT_013="$ORT_013"
+var router_status_router="$orbi_router"
+var stalist_Status="$stalist_Status"
+var orbi_model_name="$orbi_model_name";
+var edit_devname="$edit_devname";
+var old_ver="$old_ver";
+var wait_for_conn="$wait_for_conn";
+var no_internet="$no_internet";
+var serv_unreachable="$serv_unreachable";
+var down_in_back="$down_in_back";
+var unknown_error="$unknown_error";
+var upg_failed="$upg_failed";
+
+var satellite_num="<% cfg_get("satellite_online_num") %>";
+<% cfg_set("orbi_sel_num", "0") %>
+function click_online()
+{
+	if(document.getElementById("online").className=="label_click")
+		return false;
+
+	do_check(document.forms[1], url);
+}
+function click_manual()
+{
+	if(document.getElementById("manual").className=="label_click")
+		return false;
+
+	clearTimeout(timeout);
+	change_lable(1);
+	init_manual();
+}
+function loadvalue()
+{
+	update_devname();
+	if(document.location.href.indexOf("manual") != -1){
+		change_lable(1);
+		init_manual();
+	}else{
+		change_lable(0);
+		init_check_table();
+		var cf = document.forms[1];
+
+		wait_count=0;
+		if(document.location.href.indexOf("type=check") != -1){
+			refresh_content("check");
+		}else if(document.location.href.indexOf("type=upgrade") != -1){
+			refresh_content("upgrade");
+		}else{
+			init_check_table();
+			document.getElementById("refresh").disabled = false;
+		}
+	}
+}
+
+function init_manual()
+{
+	var msg = '<table border=1 cellpadding=2 cellspacing=0 width=80%>'
+		+'<tr><td>$orbi_model_name</td><td>$edit_devname</td><td>$old_ver</td></tr>';
+	for(var i=0, len=ext_dev_info.length; i<len; i++){
+		if(ext_dev_info[i]['mac address'] == undefined)
+			continue;
+		msg += '<tr><td><input type="checkbox" name="satallite_fw"> ' + ext_dev_info[i]['module name'] + '</td><td>' + ext_dev_info[i]['device name'] + '</td><td>' + ext_dev_info[i]['current version'] + '</td></tr>';
+	}
+	msg += '</table>';
+	document.getElementById("fw_satellite_table").innerHTML=msg;
+}
+function change_lable(num)
+{
+	if(num == 0){
+		document.getElementById("online").className="label_click";
+		document.getElementById("manual").className="label_unclick";
+		document.getElementById("online_content").style.display="";
+		document.getElementById("manual_content").style.display="none";
+	}else{
+		document.getElementById("online").className="label_unclick";
+		document.getElementById("manual").className="label_click";
+		document.getElementById("online_content").style.display="none";
+		document.getElementById("manual_content").style.display="";
+	}
+}
+function show_agree_info(){
+	var win = window.open("$success_href",'user agreement','width=650,height=450,top=70,left=230,status=yes,resizable=yes,scrollbars=yes');
+	win.focus();
+}
+function manual_upgrade1()
+{
+	var form = document.forms[2];
+	if(form.mtenFWUpload.value=="")
+	{
+		alert("$in_upgrade");
+		return false;
+	}
+	var filestr=form.mtenFWUpload.value;
+	var file_format=filestr.substr(filestr.lastIndexOf(".")+1); 
+	if(file_format.toUpperCase()!="IMG")
+	{
+		alert("$not_correct_file"+"img");
+		return false;
+	}
+
+	document.getElementById("online_content").style.display = "none";
+	document.getElementById("manual_content").style.display = "none";
+	pls_wait_div.style.display = "block";
+
+	form.action="/upgrade_check.cgi";
+	form.submit();
+	return true;
+}
+var topPos, leftPos;
+function manual_upgrade2(){
+	var cf = document.forms[2];
+	var fws = cf.satallite_fw;
+	var num = 0, win = 0;
+	topPos = 50;
+	leftPos = 150;
+	for(var i=0, len=ext_dev_info.length; i<len; i++){
+		if(len==1 && fws.checked == true || len>1 && fws[i].checked == true){
+			num++;
+			setTimeout("openWin("+i+");", 10);
+			topPos += 2;
+			leftPos += 5;
+		}
+	}
+	if(num == 0)
+		alert("Please select a device at least");
+}
+function openWin(index)
+{
+	window.open("http://" + ext_dev_info[index]['ip address'] + '/fwUpdate.htm', '','width=600,height=500,top=' + topPos + ',left=' + leftPos + ',status=yes,resizable=yes,scrollbars=yes');
+}
+</script>
+<input type="hidden" name="hidden_auto_upg" value="">
+<table id="online_content" width=100% border=0 cellpadding=0 cellspacing=2 style="display:none">
+<tr>
+	<td><div id="page_title_div" class="qospage_title" style="display:block; width:50%">$firm_upgrade</div></td>
+<script>
+var master="<% cfg_get("http_loginname") %>";
+if( master == "admin" )
+        document.write('<td nowrap align=right><input class="new_apply_bt ui-corner-all" type="button" name="Apply" id="apply" value="$apply_mark" onClick="auto_upgrade();" style="display:none"> &nbsp;&nbsp;<input class="new_cancel_bt ui-corner-all" type="button" name="Cancel" id="cancel" value="$cancel_mark" onClick="location.href=\'UPG_upgrade.htm\';" style="display:none" ></td>');
+else
+        document.write('<td nowrap align=right><input class="new_greyapply_bt ui-corner-all" type="button" name="Apply" id="apply" value="$apply_mark" disabled style="display:none">&nbsp;&nbsp;<input class="new_greycancel_bt ui-corner-all" type="button" name=="Cancel" id="cancel" value="$cancel_mark" disabled style="display:none"></td>');
+</script>
+</tr>
+$bluebar
+<tr><td colspan=2>&nbsp;<td><tr>
+<tr>
+	<td>$ORT_012</td>
+	<td align="right"><input type="button" class="upg_btn" name="Refresh" id="refresh" value=" $check_mark " onclick="do_check(document.forms[1], url);"></td>
+</tr>
+$bluebar
+<tr><td colspan=2>&nbsp;<td><tr>
+<tr>
+	<td colspan=2 id="fw_check_table">
+	</td>
+</tr>
+<tr><td colspan=2>&nbsp;<td><tr>
+<tr>
+	<td>&nbsp;</td>
+	<td align="right"><input type="button" class="upg_btn" name="upgrade_all" id="upgrade_all" onclick="do_upgrade(document.forms[1], url);" value="$update_all"></td>
+</tr>
+$bluebar
+</table>
+</form>
+<form method="post" action="/upgrade_check.cgi" target="formframe" enctype="multipart/form-data">
+<table id="manual_content" width=100% border=0 cellpadding=0 cellspacing=2 style="display:none">
+<tr><td colspan=2><div id="page_title_div" class="qospage_title" style="display:block">$firm_upgrade</div></td></tr>
+<tr><td colspan=2>&nbsp;<td><tr>
+$bluebar
+<tr><td colspan=2>&nbsp;<td><tr>
+<tr height="30px">
+	<td colspan=2>$upg_select_file</td>
+</tr>
+<tr>
+	<td nowrap class="indent_20">
+		<input name="mtenFWUpload" type="file" size="32" id="router_upload" maxlength="1024" class="type-file-file" onchange="this.form.upfile.value=this.value.substr(this.value.lastIndexOf('\\')+1);" contentEditable=false onkeydown="return false;" onbeforeeditfocus="return false;" onpaste="return false;" onmouseover="this.style.cursor='pointer';" />
+		<input type="text" name="upfile" size="20" maxlength="1024" readonly />&nbsp;&nbsp;&nbsp;
+		 <input type="button" value="$browse_mark"  id="browse" name="Browse" class="upg_btn" onclick="if(IE_version()!=6){this.form.router_upload.click();}" onmouseover="this.style.cursor='default';" />
+	</td>
+	<td width="20%"><input class="upg_btn" type="button" name="Upload" id="Upload" value="$upg_mark" onClick="return manual_upgrade1();"></td>
+</tr>
+<tr><td colspan=2>&nbsp;<td><tr>
+$bluebar
+<tr><td colspan=2>&nbsp;<td><tr>
+<tr height="30px">
+	<td colspan=2>$upg_select_satellite</td>
+</tr>
+<tr>
+	<td style="padding-left:20px;" id="fw_satellite_table">
+	</td>
+	<td><input type="button" name="upgrade" class="upg_btn" value=" $ORT_016 " onclick="manual_upgrade2()"></td>
+</tr>
+</table>
+</form>
+<div id="pls_wait_div" style="display:none">
+	<div align="center"><br /><br /><b>$wizard_pls_wait</b><br /><br /></div>
+	<div class="waiting_img_div" align="center"><img src="image/wait30.gif" /></div>
+</div>
+</div>
+<% help_box("0","_upgrade") %>
+</body>
+</html>

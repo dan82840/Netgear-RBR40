@@ -1,0 +1,52 @@
+#!/bin/sh
+
+link_status_2g=`/bin/cat /tmp/link_status`
+link_status_5g=`/bin/cat /tmp/link_status_5g`
+if [ x"$link_status_2g" = x"1" -a x"$link_status_5g" != x"1" ]; then
+    if [ -d /var/run/wpa_supplicant-ath11 ]; then
+        wpa_cli -i ath11 -p /var/run/wpa_supplicant-ath11 wps_pbc
+        [ -r /var/run/wps-hotplug-ath11.pid ] || {
+            wpa_cli -p /var/run/wpa_supplicant-ath11 -a /lib/wifi/wps-supplicant-update-uci -P /var/run/wps-hotplug-ath11.pid -B
+        }
+    fi
+    echo "start" > /tmp/wps_process_state
+
+    sleep 20
+
+    link_status_5g=`/bin/cat /tmp/link_status_5g`
+    if [ -f /tmp/client_wps_pbc ]; then
+        if [ -d /var/run/wpa_supplicant-ath01 ]; then
+            wpa_cli -i ath01 -p /var/run/wpa_supplicant-ath01 wps_pbc
+            [ -r /var/run/wps-hotplug-ath01.pid ] || {
+                wpa_cli -p /var/run/wpa_supplicant-ath01 -a /lib/wifi/wps-supplicant-update-uci -P /var/run/wps-hotplug-ath01.pid -B
+            }
+        fi
+    fi
+    sleep 30
+    if [ -f /tmp/client_wps_pbc ]; then
+        wlan wps --pbc_start
+    fi
+else
+    if [ -d /var/run/wpa_supplicant-ath01 ]; then
+        wpa_cli -i ath01 -p /var/run/wpa_supplicant-ath01 wps_pbc
+        [ -r /var/run/wps-hotplug-ath01.pid ] || {
+            wpa_cli -p /var/run/wpa_supplicant-ath01 -a /lib/wifi/wps-supplicant-update-uci -P /var/run/wps-hotplug-ath01.pid -B
+        }
+    fi
+    echo "start" > /tmp/wps_process_state
+
+    sleep 20
+    if [ -f /tmp/client_wps_pbc ]; then
+        if [ -d /var/run/wpa_supplicant-ath11 ]; then
+            wpa_cli -i ath11 -p /var/run/wpa_supplicant-ath11 wps_pbc
+            [ -r /var/run/wps-hotplug-ath11.pid ] || {
+                wpa_cli -p /var/run/wpa_supplicant-ath11 -a /lib/wifi/wps-supplicant-update-uci -P /var/run/wps-hotplug-ath11.pid -B
+            }
+        fi
+    fi
+    sleep 30
+    if [ -f /tmp/client_wps_pbc ]; then
+        wlan wps --pbc_start
+    fi
+fi
+

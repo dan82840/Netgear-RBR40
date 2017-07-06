@@ -1,0 +1,5 @@
+#!/bin/sh
+#when running wps,client lost connection to rootap,we should delete wps link after 150s
+/bin/sleep 150
+/bin/rm /tmp/wps_link_2g
+/bin/rm /tmp/wps_link_5g

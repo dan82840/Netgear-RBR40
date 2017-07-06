@@ -1,0 +1,22 @@
+diff -Nur bridge-utils-1.5.old/libbridge/libbridge.h bridge-utils-1.5/libbridge/libbridge.h
+--- bridge-utils-1.5.old/libbridge/libbridge.h	2015-10-13 17:07:39.675393336 +0800
++++ bridge-utils-1.5/libbridge/libbridge.h	2015-10-13 17:08:31.131393330 +0800
+@@ -21,6 +21,7 @@
+ 
+ #include <sys/socket.h>
+ #include <linux/if.h>
++#include <linux/in6.h>
+ #include <linux/if_bridge.h>
+ 
+ /* defined in net/if.h but that conflicts with linux/if.h... */
+diff -Nur bridge-utils-1.5.old/libbridge/libbridge_private.h bridge-utils-1.5/libbridge/libbridge_private.h
+--- bridge-utils-1.5.old/libbridge/libbridge_private.h	2015-10-13 17:07:39.675393336 +0800
++++ bridge-utils-1.5/libbridge/libbridge_private.h	2015-10-13 17:09:22.891393324 +0800
+@@ -24,6 +24,7 @@
+ #include <linux/sockios.h>
+ #include <sys/time.h>
+ #include <sys/ioctl.h>
++#include <linux/in6.h>
+ #include <linux/if_bridge.h>
+ 
+ #define MAX_BRIDGES	1024

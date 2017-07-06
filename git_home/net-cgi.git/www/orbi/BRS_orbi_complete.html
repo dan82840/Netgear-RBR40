@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+<% orbi_flow_head() %>
+<% hijack_language() %>
+</head>
+
+<body>
+
+<script language="javascript" type="text/javascript">
+<% cfg_set("hijack_config_status", "4") %>
+var manual_setting = "<% cfg_get("manual_set_wan") %>";
+
+function printSucessPage()
+{
+	if (window.print)
+		window.print();
+	else
+	{
+		alert(bh_not_support_print);
+		return false;
+	}
+	return false;
+}
+function go_upgrade_fw()
+{
+	document.location.href = "BRS_orbi_check_fw.html";
+}
+function to_next()
+{
+	var cf = document.forms[0];
+	if(manual_setting == "1"){
+		cf.target = "_top";
+		return true;
+	}else{
+		cf.action="/apply.cgi?/BRS_orbi_check_ap.html timestamp="+ts;
+		cf.submit_flag.value = "hijack_save_time";
+		return true;
+	}
+	return false;
+}
+</script>
+<div id="container">
+	<div class="dialog-content">
+		<!-- Orbi Configuration complete -->
+		<div id="card-orbi-config-complete" class="install-card clearfix">
+			<img class="netgear-logo" src="images/netgear.png">
+			<div class="desc-title"><script>document.write(bh_orbi_complete);</script></div>
+			<div class="desc-text"><script>document.write(bh_orbi_complete_msg1);</script></div>
+
+			<div class="master-pin-wrapper">
+				<div class="pin-wrapper pin-wrapper-admin">
+					<img class="pin-admin" src="images/pin_admin.png">
+					<div class="pin-title"><% cfg_get("http_username") %></div>
+					<div class="pin-desc"><% cfg_sed_xss("http_passwd") %></div>
+				</div>
+				<div class="pin-wrapper pin-wrapper-WiFi">
+					<img class="pin-WiFi" src="images/pin_WiFi.png">
+					<div class="pin-title"><% cfg_get_ssid_html("wl_ssid") %></div>
+					<div class="pin-desc"><% passphrase_bg_msg() %></div>
+				</div>
+			</div>
+			<% form_submit("apply", "index.htm", "hijack_toBasic")  %>
+			<% save_timestamp("hijack_toBasic", "hijack_save_time") %>
+			<input type="hidden" name="hid_save_time" value="7">
+			<script>
+				ts = "<% cfg_get("hijack_toBasic") %>";
+			</script>
+				<button class="waves-effect waves-light btn button-nav" onclick="return to_next();">
+					<span><script>document.write(bh_orbi_next_mark);</script></span>
+				</button>
+				<script>
+				if(LG_region =="French")
+					document.write('<button class="waves-effect btn-flat button-nav-skip-long" onclick="return printSucessPage();">');
+				else
+					document.write('<button class="waves-effect btn-flat button-nav-skip" onclick="return printSucessPage();">');
+				</script>
+					<span><script>document.write(bh_orbi_print);</script></span>
+				</button>
+			</form>
+		</div>
+	</div>
+</div>
+</body>
+
+</html>

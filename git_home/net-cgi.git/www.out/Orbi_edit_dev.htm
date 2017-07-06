@@ -1,0 +1,76 @@
+<% http_header("style/form.min.css", "/funcs_min.js") %>
+<% body_header("", "DEV_show_device.htm", "orbi_devname") %>
+<div class="page_title">Edit Device</div>
+<div class="fix_button">
+<TABLE width=100% border=0 cellpadding=0 cellspacing=2>
+<script>
+var master="<% cfg_get("http_loginname") %>";
+var dev_name = "<% cfg_get("orbi_hid_name") %>";
+var ts="<% cfg_get("orbi_devname") %>";
+function loadvalue()
+{
+	var cf =  document.forms[0];
+	cf.orbi_name.value = dev_name.replace(/&#92;/g, "\\").replace(/&#38;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&#40;/g,"(").replace(/&#41;/g,")").replace(/&#34;/g,'\"').replace(/&#39;/g,"'").replace(/&#35;/g,"#").replace(/&nbsp;/g," ");
+}
+function check_dev_name(cf)
+{
+	if(cf.orbi_name.value=="")
+	{
+		alert("$device_name_null");
+		return false;
+	}
+	var name_str=cf.orbi_name.value;
+	for(i=0;i<name_str.length;i++)
+	{
+		var c = name_str.charCodeAt(i);
+		if(c == 64 || c == 59)
+		{
+			alert("$device_name_error");
+			return false;
+		}
+	}
+	if("<% cfg_get("enable_adv_attached") %>" == "1")
+		cf.action="/apply.cgi?/DEV_show_device.htm timestamp="+ts;
+	else
+		cf.action="/apply.cgi?/DEV_show_device_basic.htm timestamp="+ts;
+	cf.submit();
+	return true;
+}
+function backtoDev()
+{
+	if("<% cfg_get("enable_adv_attached") %>" == "1")
+		location.href="DEV_show_device.htm";
+	else
+		location.href="DEV_show_device_basic.htm";
+}
+if( master =="admin" )
+    document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel_bt" type="button" name="Cancel" id="cancel" value="$cancel_mark" onClick="backtoDev();">&nbsp;&nbsp;<input class="apply_bt" type="button" name="Apply" id="apply" value="$apply_mark" onClick="return check_dev_name(document.forms[0]);"></TD></TR>');
+else
+	document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel1_bt" type="button" name="Cancel" id="cancel" value="$cancel_mark" disabled>&nbsp;&nbsp;<input class="apply1_bt" type="button" name="Apply" id="apply" value="$apply_mark" disabled></TD></TR>');
+</script>
+</TABLE>
+</div>
+<div id="main" class="main_top_button"> 
+<% table_header() %>
+
+<TR>
+	<TD nowrap>IP Address</TD>
+	<TD nowrap>
+	<% cfg_get("orbi_hid_ip") %>
+	</TD>
+</TR>
+<TR>
+ 	<TD nowrap>Mac Address</TD>
+	<TD nowrap><% cfg_get("orbi_hid_mac") %></TD>
+</TR>
+<TR>
+	<TD nowrap>Device name</TD>
+	<TD nowrap><input type="text" name="orbi_name" maxlength="20"/></TD>
+</TR>	
+$bluebar
+</TABLE>
+</div>
+
+</FORM>
+</BODY>
+</HTML>
