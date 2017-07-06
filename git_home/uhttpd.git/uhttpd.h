@@ -63,6 +63,7 @@
 #define UH_HTTP_MSG_POST	2
 #define UH_HTTP_MSG_PUT		3
 #define UH_HTTP_MSG_DELETE	4
+extern void __nprintf(const char *fmt, ...);
 
 struct listener;
 struct client;
