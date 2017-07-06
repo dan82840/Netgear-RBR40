@@ -593,6 +593,21 @@ User application
         http://pkgs.fedoraproject.org/repo/pkgs/strace/
         GPL
         Source Code
+[mcproxy]
+        mcproxy-2014-05-02-bbb2e7ee230c172e68766946e4b4e48f7449ee15.tar.bz2
+        git://github.com/mcproxy/mcproxy.git
+        GPL
+        Source Code
+[aws-iot]
+        aws-iot
+        DNI
+        DNI
+        Binary
+[aws-iot-device-sdk]
+        aws-iot-device-sdk
+        DNI
+        Apache
+        Source Code
 [swconfig]
         swconfig
         openwrt
