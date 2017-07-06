@@ -69,8 +69,8 @@ setup_interface_static_ip()
 	/usr/bin/killall -SIGINT ripd
 	/sbin/cmdroute start
 	/usr/sbin/ripd
-	/sbin/cmdigmp stop
-	/sbin/cmdigmp start
+	/etc/init.d/mcproxy stop
+	/etc/init.d/mcproxy start
 
 	# if IP address re-assigned, we will check qos bandwidth.
 	local qos_enable=`$CONFIG get qos_endis_on`
@@ -370,7 +370,7 @@ stop()
 	local wan_proto=$($CONFIG get wan_proto)
 	[ "x$wan_proto" = "xstatic" ] && /usr/bin/logger "[Internet disconnected]"
 
-	/sbin/cmdigmp stop
+	/etc/init.d/mcproxy stop
 	/usr/bin/killall -SIGINT ripd
 	/sbin/cmdroute restart         # Restart static route for LAN
 	$FIREWALL stop
