@@ -1,0 +1,73 @@
+#!/bin/sh /etc/rc.common
+
+START=90
+lan_ifname=`$CONFIG get lan_ifname`
+wan_ifname=`$CONFIG get wan_ifname`
+wan_proto=`$CONFIG get wan_proto`
+wan_hwifname=eth0
+current_language=`$CONFIG get GUI_Region`
+
+boot()
+{
+	start
+}
+
+kill_mcproxy()
+{
+	IGMP_PID=`ps | grep mcproxy.conf | grep -v 'grep' | awk '{print $1}'`
+	for PID in $IGMP_PID ; do
+		kill -9 $PID
+	done
+}
+
+start() 
+{
+	if [ "x$(cat /module_name)" = "xRBS40" ]; then
+		exit
+	fi
+	local igmp_enable=`$CONFIG get wan_endis_igmp`
+	kill_mcproxy
+	if [ "$igmp_enable" = "0" ]; then
+		return 0
+	fi
+        case "$wan_proto" in
+                static|dhcp)
+                        wan_ifname_upstream=$wan_ifname
+                        ;;
+                pppoe|pptp|l2tp)
+                        if [ $current_language = "Russian" ]; then
+			        wan_ifname_upstream=$wan_hwifname
+			 else
+			        wan_ifname_upstream=ppp0
+			 fi
+                        ;;
+                *)
+                        wan_ifname_upstream=$wan_ifname
+        esac
+	
+	uci set mcproxy.mcproxy=mcproxy
+	uci set mcproxy.mcproxy.respawn='1'
+	uci set mcproxy.mcproxy.protocol='IGMPv3'
+	uci set mcproxy.mcproxy.disabled='0'
+	uci set mcproxy.@instance[0]=instance
+	uci set mcproxy.@instance[0].name='mcproxy1'
+	uci set mcproxy.@instance[0].upstream="$wan_ifname_upstream"
+	uci set mcproxy.@instance[0].downstream="$lan_ifname"
+	uci set mcproxy.@instance[0].disabled='0'
+	uci commit mcproxy
+	cp /etc/mcproxy.conf /tmp
+	echo -n "pinstance proxy1:\"$wan_ifname_upstream\" ==> \"$lan_ifname\";" >> /tmp/mcproxy.conf
+	mcproxy -f /tmp/mcproxy.conf &
+
+}
+
+stop() 
+{
+	kill_mcproxy
+}
+
+restart()
+{
+	stop 
+	start
+}
