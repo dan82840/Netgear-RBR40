@@ -340,7 +340,7 @@ nif_existed() # $1: nif
 	ifconfig $1 >/dev/null 2>&1
 }
 
-vlan_create_br_and_vif() # $1: vid, $2: pri
+vlan_create_br_and_vif() # $1: wan_vid, $2: pri $3 lan_vid
 {
 	local brx="br$1"
 
@@ -352,13 +352,13 @@ vlan_create_br_and_vif() # $1: vid, $2: pri
 		brctl addif $brx $RawEth.$1
 		vlan_set_vif_pri $RawEth.$1 $2
 	else
-		vconfig add $RawEthLan $1 && ifconfig $RawEthLan.$1 up
+		vconfig add $RawEthLan $3 && ifconfig $RawEthLan.$3 up
 		vconfig add $RawEthWan $1 && ifconfig $RawEthWan.$1 up
-		brctl addif $brx $RawEthLan.$1
+		brctl addif $brx $RawEthLan.$3
 		brctl addif $brx $RawEthWan.$1
 		
 		vlan_set_vif_pri $RawEthWan.$1 $2
-		vlan_set_vif_pri $RawEthLan.$1 $2
+		vlan_set_vif_pri $RawEthLan.$3 $2
 		ifconfig $brx hw ether $wandefmac	
 		brctl stp $brx on
 	fi
@@ -513,10 +513,10 @@ vlan_create_brs_and_vifs()
 		# $1: enable, $2: name, $3: vid, $4: pri, $5:wports, $6:wlports
 		[ "$1" = "1" ] || continue
 		if [ "$2" = "Internet" ]; then 
-	#		i_vid=$3
-	#		i_pri=$4
-			vlan_create_internet_vif $3 $4
-			sw_configvlan "vlan" "add" "br" "$3" "0" "$4"
+			i_vid=$3
+			i_pri=$4
+	#		vlan_create_internet_vif $3 $4
+	#		sw_configvlan "vlan" "add" "br" "$3" "0" "$4"
 		elif [ "$2" = "Intranet" ]; then
 			if [ "$ru_feature" = "1" ]; then
 				vlan_create_intranet_vif $3 $4
@@ -524,20 +524,34 @@ vlan_create_brs_and_vifs()
 			fi
 		else
 			used_wports=$(($used_wports | $5))
-			vlan_create_br_and_vif $3 $4
-			sw_configvlan "vlan" "add" "vlan" $3 $5 $4
+			local lan_vid=$(create_lan_vid_dif_wan $3)
+			vlan_create_br_and_vif $3 $4 $lan_vid
+			sw_configvlan "vlan" "add" "vlan" "$3" "0" "$4" 
+			sw_configvlan "vlan" "add" "lan" "$lan_vid" "$5" "$4" 
 		fi
 	done
-	#if [ "$i_vid" = "0" ]; then
-	#	i_vid=$(vlan_get_wanvid) && i_pri=0
-	#	vlan_create_internet_vif $i_vid $i_pri
-	#	sw_configvlan "vlan" "add" "wan" "$i_vid" "0" "$i_pri"
-	#else
-	#	vlan_create_internet_vif $i_vid $i_pri
-	#	sw_configvlan "vlan" "add" "br" "$i_vid" "0" "$i_pri"
-	#fi
+	if [ "$i_vid" = "0" ]; then
+		i_vid=$(vlan_get_wanvid) && i_pri=0
+		vlan_create_internet_vif $i_vid $i_pri
+		sw_configvlan "vlan" "add" "wan" "$i_vid" "0" "$i_pri"
+	else
+		vlan_create_internet_vif $i_vid $i_pri
+		sw_configvlan "vlan" "add" "br" "$i_vid" "0" "$i_pri"
+	fi
 	sw_configvlan "vlan" "add" "lan" "$lanvid" $(($used_wports ^ 0x7)) "0"
 	sw_configvlan "vlan" "end"
+}
+
+create_lan_vid_dif_wan()
+{
+	local max=4095
+	local lan_vid=`expr 4095 - $1`
+	while true; do
+		[ "x$($CONFIG show |grep vlan_tag |awk '{print $3}' |grep $lan_vid)" == "x" ] && break
+		max =`expr max - 1`
+		van_id=$max
+	done
+	echo $lan_vid
 }
 
 op_create_brs_and_vifs()

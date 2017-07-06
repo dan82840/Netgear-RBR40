@@ -119,21 +119,55 @@ cat /proc/uptime | awk '{print\$1}' > /tmp/ppp/ppp_last_conn_time
 staticdns1="\$(config get wan_ether_dns1)"
 staticdns2="\$(config get wan_ether_dns2)"
 if [ "\$(config get wan_proto)" = "pptp" -a "\$(config get wan_pptp_dns_assign)" = "1" ]; then
-        echo nameserver "\$staticdns1" > /tmp/resolv.conf
-        echo nameserver "\$staticdns2" >> /tmp/resolv.conf
         if [ "x\$staticdns1" != "x" ]; then
-                /sbin/route del \$staticdns1
-        elif [ "x\$staticdns2" != "x" ]; then
-                /sbin/route del \$staticdns2
-        fi
+			/sbin/route del \$staticdns1
+			if [ "x\$(config get pptp_gw_static_route)" != "x" ]; then
+				echo nameserver "\$staticdns1" >> /tmp/resolv.conf
+				/sbin/route -A inet add -net "\$staticdns1" netmask 255.255.255.255 gw "\$(config get pptp_gw_static_route)" eth0
+			else
+				echo nameserver "\$staticdns1" > /tmp/resolv.conf
+			fi
+		fi
+		if [ "x\$staticdns2" != "x" ]; then
+			/sbin/route del \$staticdns2
+			if [ "x\$(config get pptp_gw_static_route)" != "x" ]; then
+				echo nameserver "\$staticdns2" >> /tmp/resolv.conf
+				/sbin/route -A inet add -net "\$staticdns2" netmask 255.255.255.255 gw "\$(config get pptp_gw_static_route)" eth0
+			else
+				if [ "x\$staticdns1" != "x" ]; then
+					echo nameserver "\$staticdns2" >> /tmp/resolv.conf
+				else
+					echo nameserver "\$staticdns2" > /tmp/resolv.conf
+				fi
+			fi
+		else
+			echo nameserver "\$staticdns2" >> /tmp/resolv.conf
+		fi
 elif [ "\$(config get wan_proto)" = "l2tp" -a "\$(config get wan_l2tp_dns_assign)" = "1" ]; then
-        echo nameserver "\$staticdns1" > /tmp/resolv.conf
-        echo nameserver "\$staticdns2" >> /tmp/resolv.conf
         if [ "x\$staticdns1" != "x" ]; then
-                /sbin/route del \$staticdns1
-        elif [ "x\$staticdns2" != "x" ]; then
-                /sbin/route del \$staticdns2
-        fi
+			/sbin/route del \$staticdns1
+			if [ "x\$(config get l2tp_gw_static_route)" != "x" ]; then
+				echo nameserver "\$staticdns1" >> /tmp/resolv.conf
+				/sbin/route -A inet add -net "\$staticdns1" netmask 255.255.255.255 gw "\$(config get l2tp_gw_static_route)" eth0
+			else
+				echo nameserver "\$staticdns1" > /tmp/resolv.conf
+			fi
+		fi
+		if [ "x\$staticdns2" != "x" ]; then
+			/sbin/route del \$staticdns2
+			if [ "x\$(config get l2tp_gw_static_route)" != "x" ]; then
+				echo nameserver "\$staticdns2" >> /tmp/resolv.conf
+				/sbin/route -A inet add -net "\$staticdns2" netmask 255.255.255.255 gw "\$(config get l2tp_gw_static_route)" eth0
+			else
+				if [ "x\$staticdns1" != "x" ]; then
+					echo nameserver "\$staticdns2" >> /tmp/resolv.conf
+				else
+					echo nameserver "\$staticdns2" > /tmp/resolv.conf
+				fi
+			fi
+		else
+			echo nameserver "\$staticdns2" >> /tmp/resolv.conf
+		fi
 elif [ "\$(config get wan_proto)" = "pppoe" -a "\$(config get wan_pppoe_dns_assign)" = "1" ]; then
         echo nameserver "\$staticdns1" > /tmp/resolv.conf
         echo nameserver "\$staticdns2" >> /tmp/resolv.conf
@@ -146,7 +180,6 @@ elif [ "\$(config get wan_proto)" = "pppoe" -a "\$(config get wan_pppoe_intranet
 	cat /tmp/dhcpc_resolv.conf >> /tmp/resolv.conf
 fi
 
-[ "\$(/bin/config get ipv6_sameinfo)" = "1" ] && /etc/net6conf/6pppoe adddns
 
 
 local qos_enable=\$(/bin/config get qos_endis_on)
@@ -162,7 +195,10 @@ if [ "x\$ipv6_wantype" != "x" -a "\$ipv6_wantype" != "disabled" -a "\$ipv6_wanty
 	killall net6conf
 	/etc/net6conf/net6conf restart
 fi
-/sbin/cmdigmp start
+
+[ "x\$ipv6_wantype" = "xpppoe" ] && /etc/net6conf/6pppoe adddns
+
+/etc/init.d/mcproxy start
 # If upgrade FW, need to update stremboost database
 sb_update_database
 EOF
@@ -172,7 +208,7 @@ print_ip_down()
 {
     cat <<EOF
 #!/bin/sh
-/sbin/cmdigmp stop
+/etc/init.d/mcproxy stop
 /usr/bin/killall -SIGINT ripd
 echo -n 0 > /etc/ppp/ppp0-status
 cat /proc/uptime | awk '{print$1}' > /tmp/ppp/ppp_last_stop_time
@@ -228,7 +264,7 @@ setup_interface_ppp() {
 	    route=$($CONFIG get pptp_gw_static_route)
 	    [ "x$route" != "x" ] && gw="pptp_gateway $route"
 	fi
-	[ "$($CONFIG get wan_pptp_dns_assign)" != "1" ] && dns="usepeerdns"
+	[ "$($CONFIG get wan_pptp_dns_assign)" != "1" -o "x$($CONFIG get pptp_gw_static_route)" != "x" ] && dns="usepeerdns"
 	ip=$($CONFIG get wan_pptp_server_ip)
 	language="language $($CONFIG get GUI_Region)"
         pptp_wan_assign="pptp_wan_assign $($CONFIG get wan_pptp_wan_assign)"
@@ -272,7 +308,7 @@ setup_interface_ppp() {
             route=$($CONFIG get l2tp_gw_static_route)
             [ "x$route" != "x" ] && gw="l2tp_gateway $route"
         fi
-        [ "$($CONFIG get wan_l2tp_dns_assign)" != "1" ] && dns="usepeerdns"
+        [ "$($CONFIG get wan_l2tp_dns_assign)" != "1" -o "x$($CONFIG get l2tp_gw_static_route)" != "x" ] && dns="usepeerdns"
         if [ "$($CONFIG get wan_l2tp_dns_assign)" != "0" ]; then
             staticdns1="$($CONFIG get wan_ether_dns1)"
             staticdns2="$($CONFIG get wan_ether_dns2)"

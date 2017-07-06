@@ -22,7 +22,9 @@ boot() {
                uci set wireless.@wifi-iface[3].mode=ap
                uci commit wireless
            fi
-           if [ "x$model_id" = "xRBS30" -o "x$model_id" = "xRBS40" ]; then
+           if [ "x$model_id" = "xRBS30" -o "x$model_id" = "xRBS40" -o "x$model_id" = "xRBR40" ]; then
+               uci set wireless.@wifi-iface[0].disablecoext=1
+               uci set wireless.@wifi-iface[1].disablecoext=1
                uci set wireless.@wifi-iface[2].mode=ap
                uci set wireless.@wifi-iface[2].encryption=none
                uci set wireless.@wifi-iface[2].key=

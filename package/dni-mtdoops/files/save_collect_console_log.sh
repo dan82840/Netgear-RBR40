@@ -55,6 +55,13 @@ elif [ -f /tmp/wireless-log2.txt ]; then
 	echo -n "gethatbl:" >>/tmp/wireless-log2.txt;	hyctl gethatbl br0 1000 >>/tmp/wireless-log2.txt	
 	echo -n "gethdtbl:" >>/tmp/wireless-log2.txt;   hyctl gethdtbl br0 100 >>/tmp/wireless-log2.txt	
 	echo -n "getfdb:" >>/tmp/wireless-log2.txt;   hyctl getfdb br0 100 >>/tmp/wireless-log2.txt
+
+	echo -n "=== iwpriv ath0 txrx_fw_stats 3 ===" >>/tmp/wireless-log2.txt;   iwpriv ath0 txrx_fw_stats 3 >>/tmp/wireless-log2.txt
+	echo -n "=== iwpriv ath0 txrx_fw_stats 6 ===" >>/tmp/wireless-log2.txt;   iwpriv ath0 txrx_fw_stats 6 >>/tmp/wireless-log2.txt
+	echo -n "=== iwpriv ath1 txrx_fw_stats 3 ===" >>/tmp/wireless-log2.txt;   iwpriv ath1 txrx_fw_stats 3 >>/tmp/wireless-log2.txt
+	echo -n "=== iwpriv ath1 txrx_fw_stats 6 ===" >>/tmp/wireless-log2.txt;   iwpriv ath1 txrx_fw_stats 6 >>/tmp/wireless-log2.txt
+	echo -n "=== iwpriv ath2 txrx_fw_stats 3 ===" >>/tmp/wireless-log2.txt;   iwpriv ath2 txrx_fw_stats 3 >>/tmp/wireless-log2.txt
+	echo -n "=== iwpriv ath2 txrx_fw_stats 6 ===" >>/tmp/wireless-log2.txt;   iwpriv ath2 txrx_fw_stats 6 >>/tmp/wireless-log2.txt
 fi
 	
 
@@ -88,9 +95,9 @@ dd if=/dev/mmcblk0p22 of=/tmp/panic_log.txt bs=131072 count=2
 [ -f /tmp/thermal-log2.txt ] && unix2dos /tmp/thermal-log2.txt
 
 if [ "x$collect_log" = "x1" ];then
-	zip debug-log.zip  NETGEAR_$module_name.cfg panic_log.txt Console-log1.txt Console-log2.txt  thermal-log1.txt thermal-log2.txt basic_debug_log.txt wireless-log1.txt wireless-log2.txt lan.pcap wan.pcap soapclient/* /var/log/soapclient/* /var/log/soapapp hyt_result satellite_status hyd-restart.log wsplcd-restart.log $RADARLOG
+	zip debug-log.zip  NETGEAR_$module_name.cfg panic_log.txt /firmware_version Console-log1.txt Console-log2.txt  thermal-log1.txt thermal-log2.txt basic_debug_log.txt wireless-log1.txt wireless-log2.txt lan.pcap wan.pcap soapclient/* /var/log/soapclient/* /var/log/soapapp hyt_result satellite_status hyd-restart.log wsplcd-restart.log $RADARLOG
 else
-	zip debug-log.zip NETGEAR_$module_name.cfg  panic_log.txt  Console-log1.txt Console-log2.txt thermal-log1.txt thermal-log2.txt wireless-log1.txt wireless-log2.txt basic_debug_log.txt lan.pcap wan.pcap soapclient /var/log/soapclient/* /var/log/soapapp hyt_result satellite_status hyd-restart.log wsplcd-restart.log $RADARLOG
+	zip debug-log.zip NETGEAR_$module_name.cfg  panic_log.txt /firmware_version Console-log1.txt Console-log2.txt thermal-log1.txt thermal-log2.txt wireless-log1.txt wireless-log2.txt basic_debug_log.txt lan.pcap wan.pcap soapclient /var/log/soapclient/* /var/log/soapapp hyt_result satellite_status hyd-restart.log wsplcd-restart.log $RADARLOG
 fi
 
 cd /tmp

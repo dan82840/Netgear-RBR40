@@ -63,6 +63,10 @@ curl, curl, GPL, No
 
 datalib, datalib, DNI, No
 
+aws-iot, asw-iot, DNI, NO
+
+aws-iot-device-sdk, aws-iot-device-sdk, Apache, NO
+
 dbus, dbus, GPL, No
 
 detcable, detcable, DNI, No
@@ -220,6 +224,8 @@ soapclient, soapclient, DNI, No
 ssmtp, ssmtp, GPL, No
 
 strace, strace, GPL, NO
+
+mcproxy, mcproxy, GPL, NO
 
 swconfig, swconfig, GPL, No
 

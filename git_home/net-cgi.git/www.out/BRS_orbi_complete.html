@@ -34,8 +34,6 @@ function to_next()
 		cf.target = "_top";
 		return true;
 	}else{
-		cf.action="/apply.cgi?/BRS_orbi_check_ap.html timestamp="+ts;
-		cf.submit_flag.value = "hijack_save_time";
 		return true;
 	}
 	return false;
@@ -61,12 +59,8 @@ function to_next()
 					<div class="pin-desc"><% passphrase_bg_msg() %></div>
 				</div>
 			</div>
-			<% form_submit("apply", "index.htm", "hijack_toBasic")  %>
-			<% save_timestamp("hijack_toBasic", "hijack_save_time") %>
+			<% form_submit("apply", "BRS_orbi_check_ap.html", "hijack_check_ap") %>
 			<input type="hidden" name="hid_save_time" value="7">
-			<script>
-				ts = "<% cfg_get("hijack_toBasic") %>";
-			</script>
 				<button class="waves-effect waves-light btn button-nav" onclick="return to_next();">
 					<span><script>document.write(bh_orbi_next_mark);</script></span>
 				</button>

@@ -59,5 +59,6 @@ else
 	/bin/rm /usr/sbin/dnsmasq
 	/bin/rm /sbin/ping-netgear
 	/bin/rm /usr/sbin/net-wall
+	/bin/rm /etc/init.d/openvpn
 fi
 

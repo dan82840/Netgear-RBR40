@@ -39,6 +39,8 @@ define Package/soapclient/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/soap_check_fw $(1)/usr/sbin/
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/soap_agent.init $(1)/etc/init.d/soap_agent
+	$(INSTALL_BIN) ./files/checkfirmware.sh $(1)/usr/sbin/checkfirmware.sh
+	$(INSTALL_BIN) ./files/check_wps_soap $(1)/usr/sbin/check_wps_soap
 endef
 
 $(eval $(call BuildPackage,soapclient))

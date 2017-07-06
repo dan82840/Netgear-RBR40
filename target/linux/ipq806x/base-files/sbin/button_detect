@@ -98,6 +98,14 @@ do
 			/bin/config set factory_tt3=0
 			/bin/config commit
 		fi
+
+		if [ "x$tt3_mode" = "x1" -a ${PUSH} -eq ${pushbutton} ];then  #factory-tt3 mode, action is PUSH
+			echo Exit from factory TT3 mode >/dev/console
+			/bin/config unset factory_tt3
+			/bin/config commit
+			ledcontrol -n all -c red -s off
+		fi
+
 		echo ${free_pushbut} > ${buttonfile}
 
 	elif [ ${PUSH} -eq ${pushbutton} ]; then  #non-factory mode, action is PUSH

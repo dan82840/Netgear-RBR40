@@ -159,7 +159,8 @@ sw_printconf_add_vlan() # $1: device, $2: vlan, $3: vid, $4: ports
 	cat <<EOF
 config switch_vlan
 	option device '$1'
-	option vlan '$3'
+	option vlan '$2'
+	option vid '$3'
 	option ports '$4'
 
 EOF
@@ -226,6 +227,58 @@ sw_print_ssdk_cmds_set_ports_pri() # $1: ports, $2: pri
 $ssdk_sh qos ptDefaultCpri set $p $2
 EOF
 	done
+}
+
+sw_print_ssdk_cmds_add_vlan_for_wan() # $1: vid
+{
+	cat <<EOF
+$ssdk_sh vlan entry create $1
+$ssdk_sh vlan entry append $1 $1 0,1 0,1 null null no no
+EOF
+}
+
+sw_print_ssdk_cmds_add_vlan_for_wan_with_untag() # $1: vid
+{
+	cat <<EOF
+$ssdk_sh vlan entry create $1
+$ssdk_sh vlan entry append $1 $1 0,1 0 1 null no no
+$ssdk_sh portvlan defaultcvid set 1 $1
+EOF
+}
+
+sw_print_ssdk_cmds_add_vlan_for_lan() # $1: ports $2 vid
+{
+	local p
+	cat <<EOF
+$ssdk_sh vlan entry create $2
+$ssdk_sh vlan member add $2 0 tagged
+EOF
+	for p in $1; do
+		echo $p |grep -q "t" && continue
+	cat <<EOF
+$ssdk_sh vlan member add $2 $p untagged
+EOF
+	done
+}
+
+sw_print_ssdk_cmds_set_ports_default_cvid() #$1: ports, $2: vid
+{
+	local p
+
+	for p in $1; do
+		echo $p | grep -q "t" && continue
+
+		cat <<EOF
+$ssdk_sh portvlan defaultcvid set $p $2
+EOF
+	done
+}
+
+sw_print_ssdk_cmds_set_cpu_port_vid()
+{
+	cat <<EOF
+$ssdk_sh misc cpuvid set enable
+EOF
 }
 
 sw_configvlan_factory()
@@ -319,12 +372,18 @@ sw_configvlan_vlan()
 			g_vlanindex=$(($g_vlanindex + 1))
 			sw_tmpconf_add_vlan "$g_vlanindex" "$vid" "$ports"
 		}
+		[ "$2" == "br" -o "$2" == "vlan" ] && sw_print_ssdk_cmds_add_vlan_for_wan "$vid" >> $ssdk_cmds_file
+		[ "$2" == "wan" ]  && sw_print_ssdk_cmds_add_vlan_for_wan_with_untag "$vid"  >> $ssdk_cmds_file
+		if [ "$2" == "lan" ]; then
+			sw_print_ssdk_cmds_add_vlan_for_lan "$ports" "$vid" >> $ssdk_cmds_file
+			sw_print_ssdk_cmds_set_ports_default_cvid "$ports" "$vid" >> $ssdk_cmds_file
+		fi
 		sw_print_ssdk_cmds_set_ports_pri "$ports" "$pri" >> $ssdk_cmds_file
-
 		;;
 	end)
 		sw_tmpconf_generate_swconf $g_vlanindex > $swconf
-		$swconfig dev switch0 load $swconf
+		#$swconfig dev switch0 load $swconf
+		sw_print_ssdk_cmds_set_cpu_port_vid >> $ssdk_cmds_file
 		qt sh $ssdk_cmds_file
 		;;
 	esac

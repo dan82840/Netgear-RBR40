@@ -1,0 +1,22 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org 
+
+START=99
+start() {
+	if [ "$(cat /module_name)" = "RBR40" ]; then
+		killall aws-iot
+		/usr/sbin/aws-iot -t 86400 &	
+	fi
+}
+
+stop() 
+{
+	killall aws-iot
+}
+boot()
+{
+	if [ "$(cat /module_name)" = "RBR40" ]; then
+		/usr/sbin/aws-iot -t 86400 &	
+	fi
+}
+
