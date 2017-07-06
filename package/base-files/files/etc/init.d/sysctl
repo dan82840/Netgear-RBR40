@@ -4,7 +4,8 @@
 START=99
 start() {
 	if [ "x$(/bin/config get factory_mode)" = "x1" ]; then
-		/sbin/ledcontrol -n all -c green -s off > /dev/null 2>&1
+		#in factory-tt3 mode, keep solid red
+		[ "x$(/bin/config get factory_tt3)" = "x1" ] || /sbin/ledcontrol -n all -c green -s off > /dev/null 2>&1
 		/bin/rm /sbin/ping-netgear
 		echo "in factory mode"
 	else
