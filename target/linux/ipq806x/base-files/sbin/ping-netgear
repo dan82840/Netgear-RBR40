@@ -1,11 +1,19 @@
 #!/bin/sh
 
-INTERVAL=5000000      #5s
+INTERVAL=10
 traffic_previous_status=0
 ping_previous_status=0
+old_route_status=""
+route_status=""
 
 net_detect ()
 {
+    if [ "$wait_time" != "30" ];then
+	[ "$route_status" = "$old_route_status" ] && return
+    fi
+
+    sleep 2 # route is ready, wait sometime for dns resolve.
+    echo "do ping..." > /dev/console
     ping -c 2 www.netgear.com > /tmp/ping_netgear_result 2> /dev/null
 
     result=`cat /tmp/ping_netgear_result`
@@ -29,6 +37,7 @@ net_detect ()
     fi
 }
 
+wait_time="0"
 while true
 do
     wps_status=`cat /tmp/wps_process_state` 2> /dev/null
@@ -39,6 +48,8 @@ do
     wandod_status=`/bin/config get wan_endis_dod` 2> /dev/null
     wanport_status=`cat /tmp/port_status` 2> /dev/null
     dod_connect_status=`cat /tmp/dod-led` 2> /dev/null
+    route_status=`route -n |grep UG`
+    apmode_status=`/bin/config get ap_mode` 2> /dev/null
 
     if [ "$gui_led_status" = "1" ];then
         traffic_previous_status=0
@@ -81,7 +92,7 @@ do
         fi
 
     else
-        if [ "$wanproto_status" = "pppoe" -o "$wanproto_status" = "pptp" ];then
+        if [ "$wanproto_status" = "pppoe" -o "$wanproto_status" = "pptp" ] && [ "$apmode_status" = "0" ];then
 			# If connetion mode is dial-on-demand, then get connection status from file instead of pinging Internet.
             if [ "$wandod_status" = "1" ];then
 				ppp_status=`cat /tmp/ppp/ppp0-status`
@@ -101,6 +112,9 @@ do
         fi
     fi
     
-    usleep $INTERVAL
+    sleep $INTERVAL
+    wait_time=$(( $wait_time + 1 ))
+    [ "$wait_time" -gt "30" ] && wait_time=0
+    old_route_status="$route_status"
 
 done

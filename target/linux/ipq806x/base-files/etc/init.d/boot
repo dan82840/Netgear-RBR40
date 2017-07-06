@@ -398,6 +398,21 @@ start() {
 	local rssi_move_far2g=$(/bin/config get rssi_move_far2g)
 	local rssi_move_far5g=$(/bin/config get rssi_move_far5g)
 	local rssi_prefer_2g_bh=$(/bin/config get rssi_prefer_2g_bh)
+
+
+	# Beta special requirement
+	local spath=$(/bin/config get server_path)
+	local snnumber=`cat /tmp/Seria_Number`
+	case "x$snnumber" in
+		xBTA*)
+			if [ "x$spath" = "x" ]; then
+				/bin/config set server_path=beta
+			fi
+			;;
+		*)
+			;;
+	esac
+
 	
 #	if [  "$rssi_move_far2g" = "" ];then
 #		/bin/config set rssi_move_far2g="0"
