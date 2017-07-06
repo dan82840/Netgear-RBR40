@@ -379,7 +379,7 @@ CONFIG_DEFAULT_netifd=y
 CONFIG_DEFAULT_opkg=y
 CONFIG_DEFAULT_qca-hostap-10.4=y
 CONFIG_DEFAULT_qca-hostapd-cli-10.4=y
-#CONFIG_DEFAULT_qca-wifi-fw-hw5-10.4-asic=y
+CONFIG_DEFAULT_qca-wifi-fw-hw5-10.4-asic=y
 CONFIG_DEFAULT_qca-wpa-cli-10.4=y
 CONFIG_DEFAULT_qca-wpa-supplicant-10.4=y
 CONFIG_DEFAULT_qca-wrapd-10.4=y
@@ -506,7 +506,7 @@ CONFIG_DGC_HW_ID="29765515+0+4096+512+2x2+2x2+2x2"
 #
 # Firmware's information
 #
-CONFIG_DGC_FW_VERSION="1.8.0.4"
+CONFIG_DGC_FW_VERSION="1.9.1.6"
 CONFIG_DGC_LG_VERSION="V1.0.0.286"
 CONFIG_DGC_FW_REGION=""
 CONFIG_DGC_CLOUD_VERSION="20161005"
@@ -2054,7 +2054,7 @@ CONFIG_PACKAGE_qca-hostap-10.4=y
 #
 # CONFIG_qca-hostap-10.4_USE_CUSTOM_VERSION is not set
 CONFIG_PACKAGE_qca-hostapd-cli-10.4=y
-#CONFIG_PACKAGE_qca-wifi-fw-hw11-10.4-asic=y
+CONFIG_PACKAGE_qca-wifi-fw-hw11-10.4-asic=y
 
 #
 # custom source directory
@@ -2068,7 +2068,7 @@ CONFIG_PACKAGE_qca-hostapd-cli-10.4=y
 # CONFIG_PACKAGE_qca-wifi-fw-hw2-10.4-asic is not set
 # CONFIG_PACKAGE_qca-wifi-fw-hw4-10.4-asic is not set
 # CONFIG_PACKAGE_qca-wifi-fw-hw4-10.4-emu_m2m is not set
-#CONFIG_PACKAGE_qca-wifi-fw-hw5-10.4-asic=y
+CONFIG_PACKAGE_qca-wifi-fw-hw5-10.4-asic=y
 
 #
 # custom source directory
@@ -2082,7 +2082,7 @@ CONFIG_PACKAGE_qca-hostapd-cli-10.4=y
 CONFIG_PACKAGE_qca-wpa-cli-10.4=y
 CONFIG_PACKAGE_qca-wpa-supplicant-10.4=y
 # CONFIG_PACKAGE_qca-wpa-supplicant-10.4-macsec is not set
-#CONFIG_PACKAGE_qcmbr-10.4=y
+CONFIG_PACKAGE_qcmbr-10.4=y
 # CONFIG_PACKAGE_qcmbr-10.4-netlink is not set
 CONFIG_PACKAGE_whc=y
 CONFIG_PACKAGE_whc-ui=y
@@ -2123,7 +2123,7 @@ CONFIG_PACKAGE_whc-ui=y
 # CONFIG_PACKAGE_kmod-nexus is not set
 # CONFIG_PACKAGE_kmod-nexus-example-sensor is not set
 # CONFIG_PACKAGE_macoui-db is not set
-# CONFIG_PACKAGE_p0f-db=y
+CONFIG_PACKAGE_p0f-db=y
 
 #
 # overwrite package version
