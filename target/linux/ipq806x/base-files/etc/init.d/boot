@@ -45,6 +45,15 @@ start() {
 	# generate the firewall rule file after loading the configuration data.
 	/usr/sbin/net-wall rule
 
+	factory_mode=`/bin/config get factory_mode`
+	tt3_mode=`/bin/config get factory_tt3`
+	#Keep solid red in factory_tt3 mode
+	if [ "x$factory_mode" = "x1" -a "x$tt3_mode" = "x1" ];then
+		echo Keep LED solid red in factory TT3 mode >/dev/console
+		/sbin/led_ring stop
+		/sbin/ledcontrol -n all -c red -s on
+	fi
+
 	#Do delete overlay for the first factory mode.
 	if [ "$(/bin/config get factory_mode)" = "1" ] && [ "$(/bin/config get faccalibra)" != "1" ]; then 
 		cloud backup
@@ -296,7 +305,7 @@ start() {
 
 			# set SSID of guest netwroks according to Home Router GUI Redesign Specification Rev10 section 6.3
 			/bin/config set wlg1_ssid="NETGEAR-Guest"
-			/bin/config set wla1_ssid="NETGEAR-5G-Guest"
+			/bin/config set wla1_2nd_ssid="NETGEAR-Guest"
 		fi
 		/bin/rm /tmp/ssid-setted
 		/bin/rm /tmp/passphrase-setted
@@ -323,6 +332,7 @@ start() {
 		commit_flag=1
 	fi
 	/bin/config unset dni_hold_tds_update
+	/bin/config unset fw_checkall_status
 	# need to update Streamboost database after upgrade firmwrare
 	[ -f /tmp/new_firmware ] && /bin/config set new_firmware=1 && commit_flag=1
 	[ "$commit_flag" = "1" ] && /bin/config commit
