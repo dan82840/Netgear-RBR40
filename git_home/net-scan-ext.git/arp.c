@@ -465,6 +465,31 @@ int open_arp_socket(struct sockaddr *me)
 	return s;
 }
 
+int is_same_subnet(uint8 *sip)
+{
+	in_addr_t lan_ipaddr_i, lan_netmask_i, sip_i;
+	char *lan_ipaddr, *lan_netmask;
+
+	if(config_match("i_opmode", "apmode"))
+		lan_ipaddr	= config_get("ap_dhcp_ipaddr");
+	else
+		lan_ipaddr	= config_get("lan_ipaddr");
+	lan_ipaddr_i = inet_addr(lan_ipaddr);
+
+	if(config_match("i_opmode", "apmode"))
+		lan_netmask	= config_get("ap_dhcp_netmask");
+	else
+		lan_netmask	= config_get("lan_netmask");
+	lan_netmask_i = inet_addr(lan_netmask);
+
+	memcpy(&sip_i, sip, sizeof(sip_i));
+
+	if((lan_ipaddr_i & lan_netmask_i) == (sip_i & lan_netmask_i))
+		return 1;
+
+	return 0;
+}
+
 int recv_arp_pack(struct arpmsg *arpkt, struct in_addr *send_ip)
 {
 	static uint8 zero[6] = { 0, 0, 0, 0, 0, 0 };
@@ -476,6 +501,8 @@ int recv_arp_pack(struct arpmsg *arpkt, struct in_addr *send_ip)
 	if (arpkt->ar_hrd != htons(ARPHRD_ETHER) ||arpkt->ar_pro != htons(ETH_P_IP))
 		return 0;
 	if (arpkt->ar_pln != 4 ||arpkt->ar_hln != ETH_ALEN)
+		return 0;
+	if(!is_same_subnet(arpkt->ar_sip))
 		return 0;
 
 	/*
