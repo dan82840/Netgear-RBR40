@@ -12,5 +12,12 @@ while :; do
 			echo "Restart streamboost:$time" >> /tmp/restart_process_list
 		fi
 	fi
+	status=`ps | grep soap_agent | grep -v grep`
+	if [ -z "$status" ] && [ "$(cat /module_name)" = "RBR40" ];then
+		killall soap_agent
+		time=`date '+%Y-%m-%dT%H:%M:%SZ'`
+		echo "Restart soap_agent:$time" >> /tmp/restart_process_list
+		/usr/sbin/soap_agent &
+	fi
 done
 

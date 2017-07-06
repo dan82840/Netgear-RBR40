@@ -29,19 +29,13 @@ function check_dev_name(cf)
 			return false;
 		}
 	}
-	if("<% cfg_get("enable_adv_attached") %>" == "1")
-		cf.action="/apply.cgi?/DEV_show_device.htm timestamp="+ts;
-	else
-		cf.action="/apply.cgi?/DEV_show_device_basic.htm timestamp="+ts;
+	cf.action="/apply.cgi?/DEV_show_device.htm timestamp="+ts;
 	cf.submit();
 	return true;
 }
 function backtoDev()
 {
-	if("<% cfg_get("enable_adv_attached") %>" == "1")
-		location.href="DEV_show_device.htm";
-	else
-		location.href="DEV_show_device_basic.htm";
+	location.href="DEV_show_device.htm";
 }
 if( master =="admin" )
     document.write('<TR><TD nowrap colspan=2 align=center><input class="cancel_bt" type="button" name="Cancel" id="cancel" value="$cancel_mark" onClick="backtoDev();">&nbsp;&nbsp;<input class="apply_bt" type="button" name="Apply" id="apply" value="$apply_mark" onClick="return check_dev_name(document.forms[0]);"></TD></TR>');

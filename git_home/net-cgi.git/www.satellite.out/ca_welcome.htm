@@ -2,6 +2,7 @@
 <body class="home setup" onload="loadvalue();">
 <% top_bar() %>
 <% save_timestamp("select_language","change_language") %>
+<% lang_change_status_finish() %>
 <script>
 var satellite_status="<% cat_file("/tmp/link_status") %>";
 var satellite_status_5g="<% cat_file("/tmp/link_status_5g") %>";

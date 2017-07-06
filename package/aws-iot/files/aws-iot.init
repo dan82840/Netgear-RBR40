@@ -5,7 +5,7 @@ START=99
 start() {
 	if [ "$(cat /module_name)" = "RBR40" ]; then
 		killall aws-iot
-		/usr/sbin/aws-iot -t 86400 &	
+		/usr/sbin/aws-iot 
 	fi
 }
 
@@ -15,8 +15,37 @@ stop()
 }
 boot()
 {
+	#if DUT not get ntp time, use firmware release time
+	if [ "x$(date | grep 1970)" != "x" ]; then
+		local date=`cat /firmware_time`
+		local mon=`echo $date |awk '{print $2}'`
+		local day=`echo $date |awk '{print $3}'`
+		[ "$(echo $mon |wc -L)" = "1" ] && mon="0$mon"
+		[ "$(echo $day |wc -L)" = "1" ] && day="0$day"
+		local time=`echo $date |awk '{print $4}'`
+		local hour=`echo $time |awk  -F ':' '{print $1}'`
+		local min=`echo $time |awk -F ':' '{print $2}'`
+		local sec="00"
+		local year=`echo $date |awk '{print $6}'`
+		case "$mon" in
+			Jan) mon="01";;
+			Feb) mon="02";;
+			Mar) mon="03";;
+			Apr) mon="04";;
+			May) mon="05";;
+			Jun) mon="06";;
+			Jul) mon="07";;
+			Aug) mon="08";;
+			Sep) mon="09";;
+			Oct) mon="10";;
+			Nov) mon="11";;
+			Dec) mon="12";;
+		esac
+		date $mon$day$hour$min$sec$year
+	fi
+
 	if [ "$(cat /module_name)" = "RBR40" ]; then
-		/usr/sbin/aws-iot -t 86400 &	
+		/usr/sbin/aws-iot &	
 	fi
 }
 

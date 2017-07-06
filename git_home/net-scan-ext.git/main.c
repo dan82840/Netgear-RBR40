@@ -30,26 +30,45 @@
 #include "netscan.h"
 
 static int sigval;
+time_t refresh_time;
+int scan_flag = 0;
 
 void signal_pending(int sig)
 {
 	sigval = sig;
+	if (sigval == SIGALRM) {
+		struct itimerval tv;
+		tv.it_value.tv_sec = 600;
+		tv.it_value.tv_usec = 0;
+		tv.it_interval.tv_sec = 0;
+		tv.it_interval.tv_usec = 0;
+		setitimer(ITIMER_REAL, &tv, 0);
+	}
 }
 
 void do_signal(int arp_sock, struct sockaddr *me)
 {
-	struct itimerval tv;
 	if (sigval == 0)
 		return;
 
-	if (sigval == SIGUSR1) {
+	if (sigval == SIGUSR2 || sigval == SIGALRM) {
+		time_t now;
+
+		now = time(NULL);
+		scan_flag = 1;
+		if (now - refresh_time < 10) {
+			fprintf(stderr, "refresh too quickly, not to send arp packets, last time:%d, now:%d\n", refresh_time, now);
+			return;
+		}
+		refresh_time = now;
 		/* To fix bug 22146, call reset_arp_table to set active status of all nodes in the arp_tbl to 0 in the parent process */
 		reset_arp_table();
 		scan_arp_table(arp_sock, me);
-	} else if (sigval == SIGALRM) {
+		sleep(2);
+		scan_flag = 0;
+	} else if (sigval == SIGUSR1 && scan_flag == 0){
 		show_arp_table();
-	} else if (sigval == SIGUSR2) {
-		show_host_table();
+
 	}
 
 	sigval = 0;
@@ -64,6 +83,7 @@ int main(int argc, char **argv)
 	fd_set readset;
 	struct sigaction sa;
 	struct sockaddr me;
+	struct itimerval tv;
 	
 	arp_sock = open_arp_socket(&me);
 	bios_sock = open_bios_socket();
@@ -75,6 +95,8 @@ int main(int argc, char **argv)
 
 	printf("The attached devices demo is Running ...\n");
 	daemon(1, 1);
+	
+	refresh_time = 0;
 
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_flags = SA_RESTART;
@@ -88,6 +110,12 @@ int main(int argc, char **argv)
 	else
 		max_sock = arp_sock + 1;
 	
+	tv.it_value.tv_sec = 600;
+	tv.it_value.tv_usec = 0;
+	tv.it_interval.tv_sec = 0;
+	tv.it_interval.tv_usec = 0;
+	setitimer(ITIMER_REAL, &tv, 0);
+
 	while (1) {
 		int ret;
 		int alen = 0;

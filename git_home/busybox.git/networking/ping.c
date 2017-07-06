@@ -102,6 +102,7 @@
 //usage:     "\n			(can exit earlier with -c CNT)"
 //usage:     "\n	-q		Quiet, only display output at start"
 //usage:     "\n			and when finished"
+//usage:     "\n	-d		Resolve domain name only"
 //usage:     "\n	-p		Pattern to use for payload"
 //usage:
 //usage:# define ping6_trivial_usage
@@ -332,7 +333,7 @@ static int common_ping_main(sa_family_t af, char **argv)
 
 /* Full(er) version */
 
-#define OPT_STRING ("qvc:s:t:w:W:I:np:4" IF_PING6("6"))
+#define OPT_STRING ("qvc:s:t:w:W:I:ndp:4" IF_PING6("6"))
 enum {
 	OPT_QUIET = 1 << 0,
 	OPT_VERBOSE = 1 << 1,
@@ -343,9 +344,10 @@ enum {
 	OPT_W = 1 << 6,
 	OPT_I = 1 << 7,
 	/*OPT_n = 1 << 8, - ignored */
-	OPT_p = 1 << 9,
-	OPT_IPV4 = 1 << 10,
-	OPT_IPV6 = (1 << 11) * ENABLE_PING6,
+	OPT_d = 1 << 9,
+	OPT_p = 1 << 10,
+	OPT_IPV4 = 1 << 11,
+	OPT_IPV6 = (1 << 12) * ENABLE_PING6,
 };
 
 
@@ -824,6 +826,9 @@ static void ping6(len_and_sockaddr *lsa)
 static void ping(len_and_sockaddr *lsa)
 {
 	printf("PING %s (%s)", hostname, dotted);
+	if (option_mask32 & OPT_d) // only resolve domain name 
+		return;
+
 	if (source_lsa) {
 		printf(" from %s",
 			xmalloc_sockaddr2dotted_noport(&source_lsa->u.sa));

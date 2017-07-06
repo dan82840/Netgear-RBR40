@@ -38,7 +38,7 @@
 static int run = 1;
 extern int https_download_flag;
 
-static void __nprintf(const char *fmt, ...)
+void __nprintf(const char *fmt, ...)
 {
 	va_list ap;
 	static FILE *filp;
@@ -479,6 +479,48 @@ static void uh_dispatch_request(
 #endif
 }
 
+int is_from_normal_browser(char *ua)
+{
+	int i=0;
+	char *browser[]={
+		"Mozilla",
+		"Chrome",
+		"MSIE",
+		"Safari",
+		"Opera",
+		"SeaMonkey",
+		"Edge",
+		"Maxthon",
+		"K-Meleon",
+		"Camino",
+		"TaoBrowser",
+		"LBBBrowser",
+		"QQBrowser",
+		"SE",
+		"UBrowser",
+		"UCBrowser",
+		"UCWEB",
+		"MetaSr",
+		"SogouMobileBrowser",
+		"TencentTraveler",
+		"360SE",
+		"The world",
+		NULL
+	};
+
+	if(ua == NULL)
+		return 0;
+
+	do{
+		if(browser[i] == NULL)
+			break;
+		if(strcasestr(ua, browser[i]))
+			return 1;
+	} while(++i);
+
+	return 0;
+}
+
 static void uh_mainloop(struct config *conf, fd_set serv_fds, int max_fd)
 {
 	/* master file descriptor list */
@@ -494,6 +536,8 @@ static void uh_mainloop(struct config *conf, fd_set serv_fds, int max_fd)
 
 	/*httphost*/
 	char *httphost = NULL;
+	char *useragent = NULL;
+	char *httpsoap = NULL;
 	char *remote_addr;
 	int i;
 	char lan_ip[64], lan_mask[64];
@@ -596,6 +640,23 @@ static void uh_mainloop(struct config *conf, fd_set serv_fds, int max_fd)
 								break;
 							}
 						}
+                                               foreach_header(i, req->headers)
+                                               {
+                                                       if( ! strcasecmp(req->headers[i], "SOAPAction") )
+                                                       {
+                                                               httpsoap=req->headers[i+1];
+                                                               break;
+                                                       }
+                                               }
+
+						foreach_header(i, req->headers)
+						{
+							if( ! strcasecmp(req->headers[i], "User-Agent") )
+							{
+								useragent=req->headers[i+1];
+								break;
+							}
+						}
 						
 						remote_addr = sa_straddr(&cl->peeraddr);
                                                 strcpy(lan_ip,config_get("lan_ipaddr"));
@@ -614,6 +675,8 @@ static void uh_mainloop(struct config *conf, fd_set serv_fds, int max_fd)
 								&& strstr(httphost, ".google.com")!=NULL) || strncmp(req->url, "/generate_204",13))
 								&& (strcmp(httphost, "www.google.com") || strncmp(req->url, "/blank.html", 11)) ){
 									req->url="/change_domain.htm";
+									if(!is_from_normal_browser(useragent) && httpsoap==NULL)
+										goto cleanup;
 								}
 						}	
 						

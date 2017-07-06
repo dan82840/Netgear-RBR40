@@ -831,7 +831,8 @@ int main(int argc, char *argv[])
 					temp_addr.s_addr = packet.yiaddr;
 					LOG(LOG_INFO, "Lease of %s obtained, lease time %ld", 
 						inet_ntoa(temp_addr), lease);
-					syslog(6, "[Internet connected] IP address: %s,", inet_ntoa(temp_addr));
+					if(state == REQUESTING)
+						syslog(6, "[Internet connected] IP address: %s,", inet_ntoa(temp_addr));
 					start = now;
 					timeout = t1 + start;
 					requested_ip = packet.yiaddr;

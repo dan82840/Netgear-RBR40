@@ -1845,6 +1845,18 @@
 			var cancelSwitch = function() {
 				document.location.reload();
 			};
+			var refresh_lang_status = function(){
+			$$.getData("refresh_lang.aspx", function(json) {
+				if ( json.msg == "finish" ){
+						setTimeout("document.location.reload()", 3000);//wait to reload language
+				}else if(json.msg == "checking"){
+						setTimeout(function(){ refresh_lang_status(); }, 1000);
+				}
+				else {
+						$$.alertBox(json.msg, null, cancelSwitch);
+				}
+			});
+		}
 			if ( show_value != $$("#curLang").html() )
 			{
 				$$("#curLang").html(show_value);
@@ -1865,11 +1877,10 @@
 							document.location.reload();
 						} else if ( json.lang_in_flash == "1" ) {
 							$$.postForm('#langForm','',function(json) {
-								if ( json.status == "1" ) {
-									document.location.reload();
-								} else {
-									$$.alertBox(json.msg, null, cancelSwitch);
+								if ( json.status == "1" ){
+									refresh_lang_status();
 								}
+								
 							});
 						} else {
 							$$('.changing_lang').remove();
@@ -1881,10 +1892,8 @@
 									if ( $$('.main.clearfix:first').length )
 										$$('<div class="container changing_lang">' + $$.SWITCH_LANG_DIV + '</div>').insertAfter($$('.container:first', '#content'));
 									$$.postForm('#langForm','',function(json) {
-										if ( json.status == "1" ) {
-											document.location.reload();
-										} else {
-											$$.alertBox(json.msg, null, cancelSwitch);
+										if ( json.status == "1" ){
+											refresh_lang_status();
 										}
 								});
 								}, null, cancelSwitch);
@@ -1901,6 +1910,7 @@
 				setTimeout('$$("ul", "#language").removeAttr("style")', 10);
 			}
 		};
+		
 		
 		if(need_change_lang==1)
 		 	$$.switch_language(bro_reg,browser_region);

@@ -161,8 +161,8 @@ int main(int argc, char **argv) {
 	char rootCA[PATH_MAX + 1];
 	char clientCRT[PATH_MAX + 1];
 	char cPayload[100];
-
-	int32_t i = 0;
+	char cmd[256];
+	int32_t i = 0, count = 3;
 
 	strcpy(bjson, read_json(JSON_FILE_BASE));
 	strcpy(sjson, read_json(JSON_FILE_SATELLITE));
@@ -200,7 +200,7 @@ int main(int argc, char **argv) {
 	rc = aws_iot_mqtt_init(&client, &mqttInitParams);
 	if(SUCCESS != rc) {
 		IOT_ERROR("aws_iot_mqtt_init returned error : %d ", rc);
-		return rc;
+		goto fin;
 	}
 
 	connectParams.keepAliveIntervalInSec = 10;
@@ -213,8 +213,7 @@ int main(int argc, char **argv) {
 	IOT_INFO("Connecting...");
 	rc = aws_iot_mqtt_connect(&client, &connectParams);
 	if(SUCCESS != rc) {
-		IOT_ERROR("Error(%d) connecting to %s:%d", rc, mqttInitParams.pHostURL, mqttInitParams.port);
-		return rc;
+		goto fin;
 	}
 	/*
 	 * Enable Auto Reconnect functionality. Minimum and Maximum time of Exponential backoff are set in aws_iot_config.h
@@ -224,7 +223,7 @@ int main(int argc, char **argv) {
 	rc = aws_iot_mqtt_autoreconnect_set_status(&client, true);
 	if(SUCCESS != rc) {
 		IOT_ERROR("Unable to set Auto Reconnect to true - %d", rc);
-		return rc;
+		goto fin;
 	}
 /*
 	IOT_INFO("Subscribing...");
@@ -250,7 +249,7 @@ int main(int argc, char **argv) {
 	}
 
 	while((NETWORK_ATTEMPTING_RECONNECT == rc || NETWORK_RECONNECTED == rc || SUCCESS == rc)
-		  && (publishCount > 0 || infinitePublishFlag)) {
+		&& (publishCount > 0 || infinitePublishFlag)){
 
 		//Max time the yield function will wait for read messages
 		rc = aws_iot_mqtt_yield(&client, 100);
@@ -269,6 +268,14 @@ int main(int argc, char **argv) {
 			publishCount--;
 		}
 
+		/********immediate Retry***********/
+		/****if publish success , break, else retry 3 times every 20s****/
+//		if(rc == SUCCESS)
+//			break;
+//			publishCount = 0;
+//		else
+//			sleep(20);
+
 /*		paramsQOS1.payloadLen = strlen(cPayload);
 		rc = aws_iot_mqtt_publish(&client, "analytics/", 10, &paramsQOS1);
 		if (rc == MQTT_REQUEST_TIMEOUT_ERROR) {
@@ -280,12 +287,15 @@ int main(int argc, char **argv) {
 		}
 */
 	}
-
+fin:
 	if(SUCCESS != rc) {
-		IOT_ERROR("An error occurred in the loop %d", rc);
+		IOT_ERROR("An error occurred  %d", rc);
 	} else {
 		IOT_INFO("Publish done\n");
 	}
+
+	sprintf(cmd, "echo %d >/tmp/publish_status", rc);
+	system(cmd);
 
 	return rc;
 }

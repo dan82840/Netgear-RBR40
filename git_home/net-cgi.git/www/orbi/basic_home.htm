@@ -94,10 +94,44 @@ function HtoS(s)
 }
 
 var isSynchronous=0;
+var s_num=0;
+var d_num=0;
+
+function show_device_num()
+{
+	var xmlhttp, xmlDoc;
+
+	if ( window.XMLHttpRequest)
+		xmlhttp = new XMLHttpRequest();
+	else
+		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	xmlhttp.onreadystatechange = function()
+	{
+		if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 )
+		{
+			eval(xmlhttp.responseText);
+			s_num=0;
+			d_num=0;
+			for(var i=0, len = device.length; i<len; i++)
+			{
+				if(device[i]['attachtype'] == "2")//satellte
+					s_num++;
+			}
+			d_num = len - s_num;
+		}
+		document.getElementById("satellite_num").innerHTML=s_num;
+		document.getElementById("dev_num").innerHTML=d_num;
+	};
+	xmlhttp.open("GET", "DEV_device_info.htm?ts=" + new Date().getTime(), true);
+	xmlhttp.send();
+	setTimeout("show_device_num()", 5000);
+}
 
 $$(document).ready(function(){
 	please_wait(false);
-	scrollPassword();
+	if(endis_wl_radio == 1 || endis_wla_radio ==1)
+		scrollPassword();
+	show_device_num();
 	setIconClass("internet_stat","wlan_stat","parant_control_stat","readyshare_stat","guestNetwork_stat");
 
 	//$$(".scroll").css("font-family", "Courier, MonoSpace");
@@ -240,7 +274,16 @@ function scrollPassword() {
 		else
 			document.write('<div class="icon_name" onclick="click_action(\'attached\');">$attach_device</div>');
 		</script>
-		<div id="attached_stat" class="icon_long_status"><span><% basic_device_num() %></span></div>
+		<div id="attached_stat" class="icon_long_status">
+		<span>
+			<div class="scroll" onclick="click_action('attached');" style="white-space:nowrap;" >$ORT_018
+				<b id="satellite_num"></b>
+			</div>
+			<div onclick="click_action('attached');">$num_devs:
+				<b id="dev_num"></b>
+			</div>
+		</span>
+		</div>
 	</div>
 	<div id="parental" class="basic_icon" onclick="click_action('parental');">
 		<div class="icon_name">$parental_control</div>
