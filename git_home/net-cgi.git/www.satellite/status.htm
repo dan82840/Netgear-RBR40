@@ -97,10 +97,10 @@
 					<div class="column first wifi">
 						<h2><a style="cursor: default">$EXT_STR0588</a></h2>
 						<ul class='networkStatus'>
-							<li>$wlan_mark_ssid <strong><script>document.write("<% cfg_sed_ssid_js("wl_ssid") %>".replace(/ /g, '&nbsp;'));</script></strong></li>
-							<li>$wlan_mark_chan <strong><% wl_channel() %></strong></li>
-							<li>$wlan_mark_reg <strong><% satellite_country() %></strong></li>
-							<li>$wlan_mark_mode <strong><% wl_mode("wl_") %></strong></li>
+							<li>$wlan_mark_ssid: <strong><script>document.write("<% cfg_sed_ssid_js("wl_ssid") %>".replace(/ /g, '&nbsp;'));</script></strong></li>
+							<li>$wlan_mark_chan: <strong><% wl_channel() %></strong></li>
+							<li>$wlan_mark_reg: <strong><% satellite_country() %></strong></li>
+							<li>$wlan_mark_mode: <strong><% wl_mode("wl_") %></strong></li>
 							<li>$wlan_ap: <strong><% ap_on_status("bgn") %></strong></li>
 							<li>$router_status_broadcast:  <strong><script>document.write(ssidbro)</script></strong></li>
 							<li>$ca_15_sec: <strong id="sec_24g"></strong></li>
@@ -110,10 +110,10 @@
 					<div class="column second wifi">
 						<h2><a style="cursor: default">$EXT_STR0589</a></h2>
 						<ul class='networkStatus'>
-							<li>$wlan_mark_ssid <strong><script>document.write("<% cfg_sed_ssid_js("wla_ssid") %>".replace(/ /g, '&nbsp;'));</script></strong></li>
-							<li>$wlan_mark_chan <strong><% wla_channel() %></strong></li>
-							<li>$wlan_mark_reg <strong><% satellite_country() %></strong></li>
-							<li>$wlan_mark_mode <strong><% wl_mode("wla_") %></strong></li>
+							<li>$wlan_mark_ssid: <strong><script>document.write("<% cfg_sed_ssid_js("wla_ssid") %>".replace(/ /g, '&nbsp;'));</script></strong></li>
+							<li>$wlan_mark_chan: <strong><% wla_channel() %></strong></li>
+							<li>$wlan_mark_reg: <strong><% satellite_country() %></strong></li>
+							<li>$wlan_mark_mode: <strong><% wl_mode("wla_") %></strong></li>
 							<li>$wlan_ap: <strong><% ap_on_status("an") %></strong></li>
 							<li>$router_status_broadcast:  <strong><script>document.write(ssidbro_an)</script></strong></li>
 							<li>$ca_15_sec: <strong id="sec_5g"></strong></li>

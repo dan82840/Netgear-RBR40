@@ -5,6 +5,11 @@
 <% orbi_flow_head() %>
 
 <% hijack_language() %>
+<style type="text/css">
+#personalize-btn{
+	width:auto;
+}
+</style>
 </head>
 
 <body>
@@ -35,7 +40,7 @@
 			</div>
 			<div id="confirm_div">
 				<div class="desc-title"><script>document.write(bh_orbi_personalizing_msg_2);</script></div>
-				<button class="waves-effect waves-light btn button-nav" onclick="click_conn();"><script>document.write(bh_orbi_personalizing_conn);</script></button>
+				<button id="personalize-btn" class="waves-effect waves-light btn button-nav" onclick="click_conn();"><script>document.write(bh_orbi_personalizing_conn);</script></button>
 			</div>
 		</div>
 	</div>

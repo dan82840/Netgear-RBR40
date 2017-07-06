@@ -5,11 +5,11 @@
 <script>
 if(parent.type == "basic")
         {
-                document.write("<div class=\"fix_button\">");
+                document.write("<div class=\"button\">");
         }
         else if(parent.type == "advanced")
         {
-                document.write("<div class=\"fix_adv_button\">");
+                document.write("<div class=\"fix_button\">");
         }
 </script>
 <TABLE width=100% border=0 cellpadding=0 cellspacing=2>
@@ -17,10 +17,10 @@ if(parent.type == "basic")
 	<TD nowrap colspan=2 align=center>
 	<script>
                 var master="<% cfg_get("http_loginname") %>";
-                if( master == "admin" )
-                        document.write('<input class="new_cancel_bt ui-corner-all" type="button" name="Cancel" id="cancel" value="$cancel_mark" onClick="qos_advanced();"> &nbsp;&nbsp;<input class="new_apply_bt ui-corner-all" type="button" id="apply" name="Apply" value="$apply_mark" onClick="return false;">');
+                /*if( master == "admin" )
+                        document.write('<input class="cancel_bt ui-corner-all" type="button" name="Cancel" id="cancel" value="$cancel_mark" onClick="qos_advanced();"> &nbsp;&nbsp;<input class="apply_bt ui-corner-all" type="button" id="apply" name="Apply" value="$apply_mark" onClick="return false;">');
                 else
-                        document.write('<input class="new_greycancel_bt ui-corner-all" type="button" name="Cancel" id="cancel" value="$cancel_mark" disabled> &nbsp;&nbsp;<input class="new_greyapply_bt ui-corner-all" type="button" id="apply" name="Apply" value="$apply_mark" disabled>');
+                        document.write('<input class="greycancel_bt ui-corner-all" type="button" name="Cancel" id="cancel" value="$cancel_mark" disabled> &nbsp;&nbsp;<input class="greyapply_bt ui-corner-all" type="button" id="apply" name="Apply" value="$apply_mark" disabled>');*/
         </script>
         </TD>
 </TR>
@@ -187,8 +187,9 @@ function loadvalue()
 
         if(parent.ookla_speedtest_flag == 1 )
         {
-                cf.apply.disabled=true;
-                document.getElementById("apply").className="new_greyapply_bt  ui-corner-all";
+                //cf.apply.disabled=true;
+                //document.getElementById("apply").className="greyapply_bt  ui-corner-all";
+		document.getElementById("wait_img").style.display="";
                 document.getElementById("speedtest").className="new_greyspeed_test ui-corner-all";
                 if(top.is_gr_version == 1)
                          document.getElementById("speedtest").className = "new_greyspeed_test ui-corner-all";
@@ -205,17 +206,19 @@ function loadvalue()
 
         }else if(parent.ookla_speedtest_flag == 2){
                 parent.ookla_speedtest_flag = 0;
-                if(master == "admin"){
+                /*if(master == "admin"){
                         cf.apply.disabled=false;
-                        document.getElementById("apply").className="new_apply_bt ui-corner-all";
-                }
+                        document.getElementById("apply").className="apply_bt ui-corner-all";
+                }*/
+		document.getElementById("wait_img").style.display="none";
                 document.getElementById("speedtest_content").style.display = "";
         }
         else {
-                if(master == "admin"){
+                /*if(master == "admin"){
                         cf.apply.disabled=false;
-                        document.getElementById("apply").className="new_apply_bt ui-corner-all";
-                }
+                        document.getElementById("apply").className="apply_bt ui-corner-all";
+                }*/
+		document.getElementById("wait_img").style.display="none";
                 if(bandwidth_type == "0") {
                         document.getElementById("speedtest_content").style.display = "";
                 } else {
@@ -255,7 +258,9 @@ function loadvalue()
                                 if(uplink_detect != "" && downlink_detect != "")
                                         document.write("$latest_result (" + latest_test_time + ")");
                         </script>
-                </span></TD></TR>
+                </span></TD>
+		<TD id="wait_img" style="display: none;"><img src="images/spinner.gif" width="25px" style="vertical-align:bottom;"></TD>
+		</TR>
                 <TR id="speedtest_icon" style="display:none;">
                         <TD align="center" id="download" class="icon" width="120px">
                                 <img src="/image/download.png" id="download_icon" width="15px" height="15px" /><B> $download_mark</B>
