@@ -875,6 +875,14 @@ if [ -n "$DNI_CONFIG" ]; then
     fi
     # ================================= 2nd 5G END ================================
 
+    art_region=$(artmtd -r region | grep REGION | awk '{print $2}')
+    if [ "$art_region" = "NA" ]; then
+        if [ "$(/bin/config get wl_country)" != "10" -o "$(/bin/config get wla_country)" != "10" ]; then
+            dniconfig set wl_country=10
+            dniconfig set wla_country=10
+        fi
+    fi
+
     eval country_code=\$country_code_`dniconfig get wl_country`
 
     wps_device_name=`dniconfig get netbiosname`

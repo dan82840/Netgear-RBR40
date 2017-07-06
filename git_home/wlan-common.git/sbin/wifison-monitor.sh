@@ -123,16 +123,19 @@ else
     wifischedule_24G=`config get wladv_schedule_enable`
     wifischedule_5G=`config get wladv_schedule_enable_a`
 
-    if [ "$enable_24G" -eq '1' -a "$enable_5G" -eq '1' -a "$wifischedule_24G" -eq '0' -a "$wifischedule_5G" -eq '0' ]; then
+    
+    if [ "$enable_24G" -eq '0' -a "$enable_5G" -eq '0' -a "$wifischedule_24G" -eq '0' -a "$wifischedule_5G" -eq '0' ]; then
         ath2_not_connected=`iwconfig ath2 | grep "Not-Associated"`
         ath0_not_connected=`iwconfig ath0 | grep "Not-Associated"`
-        if [ -n "$ath2_not_connected" ]; then
-        echo "Bring fronthaul 5G interface up" > /dev/console
-            ifconfig ath2 up
+        bitrate_24G=`iwconfig ath0 | awk -F'[ :]+' '/Bit Rate/ {print $4}'`
+        bitrate_5G=`iwconfig ath2 | awk -F'[ :]+' '/Bit Rate/ {print $4}'`
+        if [ "$bitrate_5G" -gt '0' ]; then
+        echo "Bring fronthaul 5G interface down" > /dev/console
+            ifconfig ath2 down
         fi
-        if [ -n "$ath0_not_connected" ]; then
-        echo "Bring fronthaul 2.4G interface up" > /dev/console
-            ifconfig ath0 up
+        if [ "$bitrate_24G" -gt '0'  ]; then
+        echo "Bring fronthaul 2.4G interface down" > /dev/console
+            ifconfig ath0 down
         fi
     fi
 
