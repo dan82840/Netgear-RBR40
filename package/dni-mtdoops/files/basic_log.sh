@@ -10,9 +10,15 @@ cat /etc/openwrt_release >> /tmp/basic_debug_log.txt
 echo "-----------------------uci value---------------------" >> /tmp/basic_debug_log.txt
 uci show >> /tmp/basic_debug_log.txt
 
+iwpriv ath0 txrx_fw_st_rst 0xffff
+iwpriv ath1 txrx_fw_st_rst 0xffff
+iwpriv ath2 txrx_fw_st_rst 0xffff
+
 while [ 1 ]
 do
 echo "======================Run time check======================" >> /tmp/basic_debug_log.txt
+date=`date`
+echo "-----------------------$date----------------------" >> /tmp/basic_debug_log.txt
 echo "-----------------------iwconfig----------------------" >> /tmp/basic_debug_log.txt
 	iwconfig >> /tmp/basic_debug_log.txt 
 echo "-------------(echo "td s"; sleep 2)| hyt-------------" >> /tmp/basic_debug_log.txt
@@ -27,6 +33,9 @@ echo "---------(echo "stadb s rate"; sleep 2) | hyt------------" >> /tmp/basic_d
 	(echo "stadb s rate"; sleep 2) | hyt >> /tmp/basic_debug_log.txt 
 echo "---------(echo "steerexec s"; sleep 2) | hyt------------" >> /tmp/basic_debug_log.txt
 	(echo "steerexec s"; sleep 2) | hyt >> /tmp/basic_debug_log.txt 
+
+echo "---------(echo "dbg here"; sleep 30) | hyt------------" >> /tmp/basic_debug_log.txt
+	(echo "dbg here"; sleep 60) | hyt >> /tmp/basic_debug_log.txt
 
 echo "-----------------------ifconfig----------------------" >> /tmp/basic_debug_log.txt
 	ifconfig >> /tmp/basic_debug_log.txt 

@@ -17,8 +17,13 @@ if [ "$enable_wifi_debug" = "1" ];then
 	iwpriv ath1 dbgLVL $wifi_debug_option
 	iwpriv ath01 dbgLVL $wifi_debug_option
 	iwpriv ath2 dbgLVL $wifi_debug_option
+	iwpriv ath0 dbgLVL $wifi_debug_option
 fi
 
+
+	iwpriv ath0 dbgLVL 0x80C80080
+	iwpriv ath2 dbgLVL 0x80C80080
+   echo 1 > /sys/module/umac/parameters/host_dbgshow
 
 while [ 1 ]
 do
