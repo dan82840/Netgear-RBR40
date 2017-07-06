@@ -29,6 +29,7 @@ FILES += vpn_apply.o vpn_asp.o
 FILES += wless_schedule_apply.o wless_schedule_asp.o wless_schedule_action.o
 FILES += devmode_apply.o
 FILES += reboot_factory_apply.o wireless_common_config.o
+FILES += device_asp.o
 
 CFLAGS += -DHOST_NAME=$(HOST_NAME)
 CFLAGS += -DAP_IFNAME=$(AP_IFNAME)

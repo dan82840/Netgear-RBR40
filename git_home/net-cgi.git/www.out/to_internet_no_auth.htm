@@ -17,9 +17,19 @@ cf.action="/apply.cgi?/BRS_netgear_success.html timestamp=" + ts;
 cf.submit_flag.value = "hijack_success";
 		
 if(have_click_take_me_to_internet != "1" )
-	cf.submit();
+{
+	if( "<% cfg_get("manual_set_wan") %>" == "1")
+		this.location.href="index.htm";
+	else
+		cf.submit();
+}
 else if(dns_hijack_v == "1" && hijack_process_v == "2")
-	cf.submit();
+{
+	if( "<% cfg_get("manual_set_wan") %>" == "1")
+		this.location.href="index.htm";
+	else
+		cf.submit();
+}
 else
 	this.location.href = "BRS_netgear_success.html";
 }

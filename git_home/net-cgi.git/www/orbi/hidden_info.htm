@@ -121,6 +121,20 @@
         <TD nowrap> &nbsp;<% cat_file("/tmp/WAN_status")%> &nbsp;</TD>
 </TR>
 <% list_satellite_ip() %>
+<tbody id=vpn_info>
+<TR>
+        <TD nowrap><B>VPN Cert : </B></TD>
+        <TD nowrap> &nbsp;<% cat_file("/tmp/openvpn/cert.info")%> &nbsp;</TD>
+</TR>
+<TR>
+        <TD nowrap><B>VPN Cert begin time : </B></TD>
+	<TD nowrap> &nbsp;<% show_vpn_expire_time("1")%>&nbsp;</TD>
+</TR>
+<TR>
+        <TD nowrap><B>VPN Cert end time : </B></TD>
+	<TD nowrap> &nbsp;<% show_vpn_expire_time("2")%> &nbsp;</TD>
+</TR>
+</tbody>
 
 </table>
 </BODY>

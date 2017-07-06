@@ -3,6 +3,7 @@
 <div id="fixedtop"></div>
 <% top_bar() %>
 <% save_timestamp("select_language","change_language") %>
+<% lang_change_status_finish() %>
 <script>
 var ts = "<% cfg_get("wifi_devices") %>";
 var wps_progress_status="<% wps_process_status() %>";

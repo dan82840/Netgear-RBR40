@@ -54,7 +54,7 @@ function check_forwarding_edit(cf)
 		cf.select_edit.value=parseInt(forward_table[select_num]);
 		cf.select_edit_num.value=parseInt(item_count[select_num]);
 		cf.submit_flag.value="forwarding_editnum_range";
-		cf.action="/apply.cgi?/forwarding_edit_wait.htm timestamp="+ts;
+		cf.action="/apply.cgi?/forwarding_edit.htm timestamp="+ts;
 		cf.submit();
 		return true;
 	}
@@ -801,5 +801,53 @@ function click_arrange_by_ip()
                 fragment.appendChild(trValue[i]);
         }
         tbody.appendChild(fragment);
+}
+
+function show_devices()
+{
+	var xmlhttp, xmlDoc;
+	var msg = '<TABLE id="attach_device" border=1 cellpadding=2 cellspacing=0 width=100%>'
+		+ '<TR>'
+		+ '<TD nowrap align=center><span class="subhead"> &nbsp; </span></TD>'
+		+ '<TD nowrap align=center><span class="subhead">$lan_mark_ip</span></TD>'
+		+ '<TD nowrap align=center><span class="subhead">$lan_mark_name</span></TD>'
+		+ '</TR>';
+	if ( window.XMLHttpRequest)
+		xmlhttp = new XMLHttpRequest();
+	else
+		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	xmlhttp.onreadystatechange = function()
+	{
+		if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 )
+		{
+			eval(xmlhttp.responseText);
+			len = device.length;
+			for(var j=0; j<len; j++)
+			{
+				if(device[j]['attachtype'] == "2")//satellte
+					continue;
+				var str_name = device[j]['name'];
+				str_name=str_name.replace(/&#38;/g,"&");
+				attach_name_array[i]=str_name;
+				attach_ip_array[i]=device[j]['ip'];
+				msg += '<TR><TD nowrap align=center><input type="radio" name="MacSelect" id="mac_select'+(i+1)+'" value="'+i+'" onclick="ipaddr_value('+i+')"></TD><TD nowrap align=center>'+attach_ip_array[i]+'</TD><TD nowrap align=center>'+attach_name_array[i]+'</TD></TR>';
+				i++;
+			}
+			msg += '</table>';
+			document.getElementById("devices").innerHTML=msg;
+		}
+	};
+	xmlhttp.open("GET", "DEV_device_info.htm?ts=" + new Date().getTime(), true);
+	xmlhttp.send();
+}
+
+function ipaddr_value(num)
+{
+	var cf=document.forms[0];
+	var ipaddr_array=attach_ip_array[num].split('.');
+	cf.server_ip1.value=ipaddr_array[0];
+	cf.server_ip2.value=ipaddr_array[1];
+	cf.server_ip3.value=ipaddr_array[2];
+	cf.server_ip4.value=ipaddr_array[3];
 }
 

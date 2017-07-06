@@ -293,7 +293,12 @@ function loadvalue()
 					document.write("<td nowrap>"+str_name.replace(/\s/g, '&nbsp;')+"</td>");
 					document.write("<td nowrap>"+each_info[1]+"</td>");
 					document.write("<td nowrap>"+each_info[2]+"</td>");
-					document.write("<td nowrap>"+each_info[3]+"</td></TR>");
+					if(each_info[3] == "wireless")
+						document.write("<td nowrap>$wireless</td></TR>");
+					else if(each_info[3] == "wired")
+						document.write("<td nowrap>$acc_wired</td></TR>");
+					else
+						document.write("<td nowrap>"+each_info[3]+"</td></TR>");
 				}
 			}
 		</script>

@@ -141,7 +141,7 @@ function refresh_content(type)
 						else if(fw_sta == "002")
 							discription = serv_unreachable;
 						else if(fw_sta == "003")
-							discription = no_new_version;
+							discription = upg_failed;
 						else if(fw_sta == "005" && wait_time < MAX_CHK_TRIES && type == "check")
 						{
 							discription = down_in_back;
@@ -150,7 +150,7 @@ function refresh_content(type)
 						else if(fw_sta === "004")
 							discription = upg_failed;
 						else if(wait_time >= MAX_CHK_TRIES || fw_sta == "0" && wait_time>20 && check_satellite_times > 10) { //This satellite lost connection to base
-							discription = "No response";
+							discription = upg_failed;
 							dropped_num ++;
 						}
 						else{
