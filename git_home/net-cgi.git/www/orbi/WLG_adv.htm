@@ -594,13 +594,13 @@ else if(an_router_flag == 1)
                 document.write('<select name="WRegion" id="wireless_region" size="1" disabled="disabled">');
         else
                 document.write('<select name="WRegion" id="wireless_region" size="1">');
-		if(netgear_region.toUpperCase() == "PR")
-		{
-			document.write('<option value=3>$coun_ca</option>');
-			document.write('<option value=11>$coun_ch</option>');
-		}
-		else
-		{
+		//if(netgear_region.toUpperCase() == "PR")
+		//{
+		//	document.write('<option value=3>$coun_ca</option>');
+		//	document.write('<option value=11>$coun_ch</option>');
+		//}
+		//else
+		//{
                 document.write('<option value=0>$coun_af</option>');
                 document.write('<option value=1>$coun_as</option>');
                 document.write('<option value=2>$coun_au</option>');
@@ -622,7 +622,7 @@ else if(an_router_flag == 1)
                 document.write('<option value=20>$coun_si</option>');
                 document.write('<option value=9>$coun_sa</option>');
                 document.write('<option value=21>$coun_ta</option>');
-		}
+		//}
         if(netgear_region.toUpperCase() == "NA" || netgear_region.toUpperCase() == "US")
                 document.write('<option value=10>$coun_na</option>');
         else

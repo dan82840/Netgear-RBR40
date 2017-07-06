@@ -215,9 +215,11 @@ $bluebar
 </tr>
 <tr>
 	<td nowrap class="indent_20">
+	<div style="height:25px; overflow:hidden; position:relative">
 		<input name="mtenFWUpload" type="file" size="32" id="router_upload" maxlength="1024" class="type-file-file" onchange="this.form.upfile.value=this.value.substr(this.value.lastIndexOf('\\')+1);" contentEditable=false onkeydown="return false;" onbeforeeditfocus="return false;" onpaste="return false;" onmouseover="this.style.cursor='pointer';" />
 		<input type="text" name="upfile" size="20" maxlength="1024" readonly />&nbsp;&nbsp;&nbsp;
 		 <input type="button" value="$browse_mark"  id="browse" name="Browse" class="upg_btn" onclick="if(IE_version()!=6){this.form.router_upload.click();}" onmouseover="this.style.cursor='default';" />
+	</div>
 	</td>
 	<td width="20%"><input class="upg_btn" type="button" name="Upload" id="Upload" value="$upg_mark" onClick="return manual_upgrade1();"></td>
 </tr>
