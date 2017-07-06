@@ -77,9 +77,9 @@ static void mulppp_clearrecord(void)
 
 	if (NULL == (tfp = fopen(RECORD_FILE, "r"))) 
 		return;
-	system("echo 1111 >> /tmp/kkk");
+	
 	system("ifconfig ppp1| grep \"P-t-P:\" | awk {'print$3'} | awk -F\":\" {'print$2'} > /tmp/ppp1gw");
-	system("echo 1112 >> /tmp/kkk");
+	
 	while(fgets(tbuf, sizeof(tbuf), tfp)){
 		struct in_addr taddr;
 		char abuf[256] = {0};
