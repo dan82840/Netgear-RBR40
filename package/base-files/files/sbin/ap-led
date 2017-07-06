@@ -24,6 +24,8 @@ CLIENT_LINK_5G_LED_OFF='echo 0 > /tmp/client_color_5g'
 
 IFNAME_5G="ath2"
 IFNAME_2G="ath0"
+IFNAME_5G_guest="ath21"
+IFNAME_2G_guest="ath02"
 
 
 update_arrow_led_state()
@@ -98,6 +100,7 @@ update_led_state()
 {
 #    current_rate=`iwpriv ath0 get_txrate | cut -f2 -d':' | sed 's/[ \t ]*$//g'`
     wlanconfig $IFNAME_2G list sta | awk '{print $4}' | grep -Eo '[0-9]+' > /tmp/my_all_client_rate
+	[ "$(config get wlg1_endis_guestNet)" = "1" ] && wlanconfig $IFNAME_2G_guest list sta | awk '{print $4}' | grep -Eo '[0-9]+' >> /tmp/my_all_client_rate
     while read onerate
     do
         if [ "$current_rate" = "" -o "$onerate" > "$current_rate" ]; then
@@ -168,6 +171,7 @@ update_led_state_5g()
 {
 #    current_rate_5g=`iwpriv ath1 get_txrate | cut -f2 -d':' | sed 's/[ \t ]*$//g'`
     wlanconfig $IFNAME_5G list sta | awk '{print $4}' | grep -Eo '[0-9]+' > /tmp/my_all_client_rate_5g
+	[ "$(config get wla1_2nd_endis_guestNet)" = "1" ] && wlanconfig $IFNAME_5G_guest list sta | awk '{print $4}' | grep -Eo '[0-9]+' >> /tmp/my_all_client_rate_5g
     while read onerate
     do
         if [ "$current_rate_5g" = "" -o "$onerate" > "$current_rate_5g" ]; then
@@ -289,8 +293,10 @@ router_link_led_action()
 
 }
 
-
-
+sta_list=0
+sta_list_guest=0
+sta_list_5g=0
+sta_list_5g_guest=0
 
 
 while true; do
@@ -302,7 +308,13 @@ while true; do
     [ $check_n -eq 5 ] && let check_n=0
     let check_n=$check_n+1
     sta_list=`wlanconfig $IFNAME_2G list sta | wc -l`
+	if [ "$(config get wlg1_endis_guestNet)" = "1" ]; then
+		sta_list_guest=`wlanconfig $IFNAME_2G_guest list sta | wc -l`
+	fi
     sta_list_5g=`wlanconfig $IFNAME_5G list sta | wc -l`
+	if [ "$(config get wla1_2nd_endis_guestNet)" = "1" ]; then
+		sta_list_5g_guest=`wlanconfig $IFNAME_5G_guest list sta | wc -l`
+	fi
 
 
 #    ap_mode=`cat /tmp/endis_wl_radio`
@@ -319,7 +331,7 @@ while true; do
 #    ap_list=`wlanconfig ath01 list sta | wc -l`
 #    ap_list_5g=`wlanconfig ath11 list sta | wc -l`
 #    if [ "$sta_list" != "0" -o "$sta_list_5g" != "0" ] && [ "$ap_list" != "0" -o "$ap_list_5g" != "0" ]; then
-    if [ "$sta_list" != "0" -o "$sta_list_5g" != "0" ] ; then
+    if [ "$sta_list" != "0" -o "$sta_list_5g" != "0" -o "$sta_list_guest" != "0" -o "$sta_list_5g_guest" != "0" ] ; then
         let all_link_time=$all_link_time+1
     else
         let all_link_time=0
@@ -328,7 +340,7 @@ while true; do
 
 
     eth_link=`cat /tmp/eth_link`
-    if [ "$sta_list" != "0" -o "$sta_list_5g" != "0" -o "$eth_link" = "1" ]; then
+    if [ "$sta_list" != "0" -o "$sta_list_5g" != "0" -o "$eth_link" = "1" -o "$sta_list_guest" != "0" -o "$sta_list_5g_guest" != "0" ]; then
         if [ "$last_link" = "0" ]; then
 	    echo 1 > /tmp/check_link
 	    last_link=1
@@ -344,7 +356,7 @@ while true; do
 #    [ "$sta_list" != "0"  ] && update_led_state || eval `echo 0 > /tmp/client_color`
 #    [ "$sta_list_5g" != "0"  ] && update_led_state_5g || eval `echo 0 > /tmp/client_color_5g`
 
-    if [ "$sta_list" != "0" ]; then
+    if [ "$sta_list" != "0" -o "$sta_list_guest" != "0" ]; then
         update_led_state
     elif [ ! -d /proc/$IFNAME_2G -o "$(ifconfig $IFNAME_2G | grep UP)" = "" ]; then
         # handle fastlane and radio disable
@@ -354,7 +366,7 @@ while true; do
         eval `echo 0 > /tmp/client_color`
         eval `echo 0 > /tmp/client_avg_rate`
     fi
-    if [ "$sta_list_5g" != "0" ]; then
+    if [ "$sta_list_5g" != "0" -o "$sta_list_5g_guest" != "0" ]; then
         update_led_state_5g
     elif [ ! -d /proc/$IFNAME_5G -o "$(ifconfig $IFNAME_5G | grep UP)" = "" ]; then
         # handle fastlane and radio disable
