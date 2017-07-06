@@ -341,7 +341,7 @@ case "$1" in
 				/etc/net6conf/net6conf restart
 			fi
 
-			/sbin/cmdigmp start
+			/etc/init.d/mcproxy start
 			# If upgrade FW, need to update stremboost database
 			sb_update_database
 		fi
