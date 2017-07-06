@@ -77,8 +77,12 @@ vlan_iptv_wl_enable()
 }
 
 unload_ecm() {
-	[ -d /sys/module/ecm ] && rmmod ecm
-
+	if [ -d /sys/module/ecm ]; then
+		/etc/init.d/hyd stop
+		sleep 1
+		rmmod ecm
+		/etc/init.d/hyd start
+	fi
 	sysctl -w net.bridge.bridge-nf-call-ip6tables=0
 	sysctl -w net.bridge.bridge-nf-call-iptables=0
 }
