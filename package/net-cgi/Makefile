@@ -39,6 +39,8 @@ define Package/net-cgi/install
 	$(LN) /tmp/openvpn/windows.zip $(1)/$(WEB_PATH)/windows.zip
 	$(LN) /tmp/openvpn/nonwindows.zip $(1)/$(WEB_PATH)/nonwindows.zip
 	$(LN) /tmp/openvpn/smart_phone.zip $(1)/$(WEB_PATH)/smart_phone.zip
+	$(INSTALL_DIR) $(1)/sbin
+	$(INSTALL_BIN) ./files/dni_wlan $(1)/sbin/
 endef
 
 $(eval $(call BuildPackage,net-cgi))
