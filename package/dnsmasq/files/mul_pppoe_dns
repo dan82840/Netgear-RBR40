@@ -24,6 +24,8 @@ add_record(){
 	local dname=$1
 	local ip_addr=$2
 	local rcstring="#$dname#$ip_addr#"
+	[ -f $RECORD_FILE ] || touch $RECORD_FILE
+
 	echo "mul_pppoe_dns add_record $dname $ip_addr"
 	if [ `grep "$rcstring" $RECORD_FILE -c 2>/dev/null` -gt 0 ]; then
 		return
@@ -80,7 +82,6 @@ del_ppp0_dns_route(){
 	fi
 }
 
-[ -f $RECORD_FILE ] || touch $RECORD_FILE
 # See how we were called.
 case "$1" in
   add_record)
