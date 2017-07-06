@@ -3,6 +3,7 @@
 
 #include <sys/ioctl.h>
 #include <sys/time.h>
+#include <time.h>
 #include <sys/signal.h>
 #include <sys/sysinfo.h>
 #include <arpa/inet.h>

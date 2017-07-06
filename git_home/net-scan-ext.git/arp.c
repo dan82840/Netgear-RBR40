@@ -373,10 +373,12 @@ void recv_bios_pack(char *buf, int len, struct in_addr from)
 	e = p + (num * 18);
 	/* unique name, workstation service - this is computer name */
 	for (; p < e; p += 18)
-		if (p[15] == 0 && (p[16] & 0x80) == 0)
+		if ((p[15] == 0 || p[15] == 0x20) && (p[16] & 0x80) == 0)
 			break;
 	if (p == e)
 		return;
+	if (p[15] == 0x20)
+		p[15] = 0;
 	update_bios_name(e, (char *)p, from);
 }
 
@@ -768,7 +770,6 @@ void scan_arp_table(int sock, struct sockaddr *me)
 {
 	int i;
 	int count = 0;
-	struct itimerval tv;
 	struct arpmsg *req;
 	struct arp_struct *u;
 	char *ipaddr;
@@ -776,7 +777,7 @@ void scan_arp_table(int sock, struct sockaddr *me)
 	struct in_addr addr;
 	FILE *fp;
 	
-	while (count != 3) {
+	while (count != 2) {
 		count++;
 		req = &arpreq;
 		for (i = 0; i < (NEIGH_HASHMASK + 1); i++) {
@@ -807,16 +808,9 @@ void scan_arp_table(int sock, struct sockaddr *me)
 			}
 			fclose(fp);
 		}
-		if(count < 3)
+		if(count < 2)
 			usleep(500000);
 	}
-	
-	/* show the result after 1s */
-	tv.it_value.tv_sec = 1;
-	tv.it_value.tv_usec = 0;
-	tv.it_interval.tv_sec = 0;
-	tv.it_interval.tv_usec = 0;
-	setitimer(ITIMER_REAL, &tv, 0);
 }
 
 void update_host_table(uint8 *mac, char *host)
